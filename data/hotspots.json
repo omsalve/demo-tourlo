@@ -1,0 +1,105 @@
+{
+  "_help": "yaw: degrees left/right from the centre of the pano (positive is to the right, range -180 to 180). pitch: degrees up/down (positive is up, range -90 to 90). Open the site with ?dev=1 and click inside a pano to log and copy the yaw/pitch of any point.",
+  "tours": {
+    "typeA": {
+      "title": "Type A, 3 BHK Residence",
+      "rooms": [
+        {
+          "id": "typeA_living",
+          "label": "Living",
+          "file": "typeA_living.jpg",
+          "initialYaw": -10,
+          "initialPitch": -4,
+          "hotspots": [
+            { "to": "typeA_living_dining", "label": "Living and dining", "yaw": 0, "pitch": -6 },
+            { "to": "typeA_study", "label": "Study", "yaw": 40, "pitch": -4 }
+          ]
+        },
+        {
+          "id": "typeA_living_dining",
+          "label": "Living and dining",
+          "file": "typeA_living_dining.jpg",
+          "initialYaw": -30,
+          "initialPitch": -4,
+          "hotspots": [
+            { "to": "typeA_living", "label": "Living", "yaw": -80, "pitch": -10 },
+            { "to": "typeA_study", "label": "Study", "yaw": 66, "pitch": -4 }
+          ]
+        },
+        {
+          "id": "typeA_study",
+          "label": "Study",
+          "file": "typeA_study.jpg",
+          "initialYaw": 0,
+          "initialPitch": -4,
+          "hotspots": [
+            { "to": "typeA_living_dining", "label": "Living and dining", "yaw": -60, "pitch": -4 }
+          ]
+        }
+      ]
+    },
+    "typeB": {
+      "title": "Type B, 4 BHK Sky Villa",
+      "rooms": [
+        {
+          "id": "typeB_living",
+          "label": "Living",
+          "file": "typeB_living.jpg",
+          "initialYaw": 0,
+          "initialPitch": -4,
+          "hotspots": [
+            { "to": "typeB_lounge", "label": "Double height lounge", "yaw": -30, "pitch": -4 },
+            { "to": "typeB_stair_dining", "label": "Stair and dining", "yaw": 42, "pitch": -4 }
+          ]
+        },
+        {
+          "id": "typeB_lounge",
+          "label": "Lounge",
+          "file": "typeB_lounge.jpg",
+          "initialYaw": -10,
+          "initialPitch": 0,
+          "hotspots": [
+            { "to": "typeB_stair_dining", "label": "Stair and dining", "yaw": 38, "pitch": -2 },
+            { "to": "typeB_living", "label": "Living", "yaw": -40, "pitch": -8 }
+          ]
+        },
+        {
+          "id": "typeB_stair_dining",
+          "label": "Stair and dining",
+          "file": "typeB_stair_dining.jpg",
+          "initialYaw": 0,
+          "initialPitch": -2,
+          "hotspots": [
+            { "to": "typeB_living", "label": "Living", "yaw": -110, "pitch": -3 },
+            { "to": "typeB_lounge", "label": "Lounge", "yaw": 10, "pitch": -2 }
+          ]
+        }
+      ]
+    },
+    "amenity": {
+      "title": "Landscaped Garden",
+      "rooms": [
+        {
+          "id": "amenity_garden_1",
+          "label": "Garden lawn",
+          "file": "amenity_garden_1.jpg",
+          "initialYaw": 0,
+          "initialPitch": 0,
+          "hotspots": [
+            { "to": "amenity_garden_2", "label": "Clubhouse lawn", "yaw": 0, "pitch": -10 }
+          ]
+        },
+        {
+          "id": "amenity_garden_2",
+          "label": "Clubhouse lawn",
+          "file": "amenity_garden_2.jpg",
+          "initialYaw": -30,
+          "initialPitch": 0,
+          "hotspots": [
+            { "to": "amenity_garden_1", "label": "Garden lawn", "yaw": 90, "pitch": -8 }
+          ]
+        }
+      ]
+    }
+  }
+}
