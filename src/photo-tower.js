@@ -66,16 +66,20 @@ export class PhotoTower {
           .join('')}
         <svg class="floor-overlay" viewBox="0 0 ${this.W} ${this.H}" preserveAspectRatio="xMidYMid slice" aria-label="Tower floors"></svg>
       </div>
-      <button class="photo-arrow prev" type="button" aria-label="Previous view">${ARROW_L}</button>
+      ${
+        data.views.length > 1
+          ? `<button class="photo-arrow prev" type="button" aria-label="Previous view">${ARROW_L}</button>
       <button class="photo-arrow next" type="button" aria-label="Next view">${ARROW_R}</button>
-      <div class="photo-dots" aria-hidden="true">${data.views.map((_, i) => `<span class="${i === 0 ? 'on' : ''}"></span>`).join('')}</div>`;
+      <div class="photo-dots" aria-hidden="true">${data.views.map((_, i) => `<span class="${i === 0 ? 'on' : ''}"></span>`).join('')}</div>`
+          : ''
+      }`;
     container.appendChild(stage);
     this.stage = stage;
     this.world = stage.querySelector('.photo-world');
     this.svg = stage.querySelector('.floor-overlay');
 
-    stage.querySelector('.prev').addEventListener('click', () => this.rotate(-1));
-    stage.querySelector('.next').addEventListener('click', () => this.rotate(1));
+    stage.querySelector('.prev')?.addEventListener('click', () => this.rotate(-1));
+    stage.querySelector('.next')?.addEventListener('click', () => this.rotate(1));
     this.bindPointer();
     this.buildFloors();
 
@@ -227,6 +231,7 @@ export class PhotoTower {
 
   rotate(step) {
     const n = this.data.views.length;
+    if (n < 2) return;
     this.showView((this.viewIndex + step + n) % n);
     this.onRotate?.(this.view.id);
   }

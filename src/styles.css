@@ -853,40 +853,6 @@ svg {
   line-height: 1.5;
 }
 
-.emi-out {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.emi-out .emi-value {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--gold);
-}
-
-.emi-out .emi-label {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.emi-breakdown {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.emi-breakdown strong {
-  display: block;
-  color: var(--text);
-  font-size: 13px;
-}
-
 .slider {
   margin-bottom: 14px;
 }

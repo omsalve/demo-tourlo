@@ -3,7 +3,7 @@ import { session } from './storage.js';
 import { initAnalytics, track, trackTimeSpent } from './analytics.js';
 import { inr, sqft, FACING, STATUS, ordinal, esc } from './format.js';
 import { planFor, floorplate } from './plans.js';
-import { costSheetHTML, emiHTML, bindEmi } from './cost.js';
+import { costSheetHTML } from './cost.js';
 import { LeadGate } from './lead.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -486,14 +486,12 @@ function openUnit(unitNo) {
       </dl>
     </div>
     ${costSheetHTML(u, state.inventory.pricing)}
-    ${emiHTML()}
     <div class="card">
       <h3>See this with your own project</h3>
       <p class="fineprint" style="margin:0 0 12px">Tourlo turns your inventory, plans and renders into a live sales gallery like this one.</p>
       <a class="btn btn-gold btn-block cta-book" data-cta="unit_view" href="${esc(config.bookingUrl)}" target="_blank" rel="noopener">Book a full live demo</a>
     </div>`;
   $('#panel-body').querySelector('.cta-book').addEventListener('click', () => track('book_demo_click', { location: 'unit_view' }));
-  bindEmi($('#panel-body'), u.price, () => track('emi_used', { unit: u.unit }));
   $('#panel-body').scrollTop = 0;
   openSheet($('#panel'));
 }

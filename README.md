@@ -2,11 +2,11 @@
 
 An interactive sales gallery demo for **Tourlo Demo Residences** (fictional, Mumbai), built to embed on tourlo.in.
 
-- Photoreal tower explorer: 4 rendered angles with day and dusk versions, and an SVG floor overlay so every one of the 24 floors is tappable on the photo
+- Photoreal tower explorer: one rendered hero with day and dusk versions, and an SVG floor overlay so every one of the 24 floors is tappable on the photo
 - "Walk the site" 360 tour of the plaza, lobby, podium garden, rooftop, aerial view and metro station, linked into the apartment interiors
 - A Three.js massing model of the tower as a fallback (`?view=3d`)
 - Live inventory from `data/inventory.json` with filters (BHK, status, price, facing). Matching floors glow on the tower
-- Unit view with an indicative SVG plan, specs, an indicative cost sheet and an EMI calculator
+- Unit view with an indicative SVG plan, specs, and an indicative cost sheet
 - 360 viewer with drag, pinch or scroll zoom, gyroscope on phones, room thumbnails and hotspots between rooms
 - Lead form after about 60 seconds of interaction or when a second 360 room is opened
 - Optional GA4 events and a persistent "Book a full live demo" call to action
@@ -72,7 +72,7 @@ These are baked in at build time, so redeploy after changing them.
 
 **Lead payload** includes `name`, `company`, `phone`, `email`, `role`, `trigger` (`time` or `second_room`), `page`, `referrer`, `submittedAt`, `activeSeconds`, `lastFloor`, `lastUnit` and `roomsViewed`. If the webhook does not answer CORS preflight requests (common with Zapier, Make and Google Apps Script), the demo retries as a simple `text/plain` request with the same JSON body.
 
-**GA4 events:** `floor_click`, `unit_open`, `pano_open`, `filter_used`, `lead_submit`, `book_demo_click`, `time_spent` (engaged seconds, sent when the tab is hidden or closed). `emi_used` is sent as a bonus. With `?dev=1` all events are also logged to the console.
+**GA4 events:** `floor_click`, `unit_open`, `pano_open`, `filter_used`, `lead_submit`, `book_demo_click`, `time_spent` (engaged seconds, sent when the tab is hidden or closed). With `?dev=1` all events are also logged to the console.
 
 ## Editing inventory
 
@@ -108,7 +108,7 @@ npm run inventory
 
 ## Photo landing (tower explorer)
 
-The landing uses the stills in `assets/landing/` (`hero_1_dusk.jpg`, `hero_1_day.jpg` and so on, one dusk and one day image per angle with identical framing) and `data/tower-views.json`.
+The landing uses the stills in `assets/landing/` (`hero_dusk.jpg` and `hero_day.jpg`, identical framing) and `data/tower-views.json`.
 
 For each view, `faces` lists the visible facades as four corners in image pixels: `tl` and `tr` at the top of the 24th floor, `bl` and `br` at the bottom of the 1st floor (the top of the lobby). The app splits each facade into 24 floors with a perspective correct mapping, so the outlines follow the photo.
 
@@ -174,7 +174,7 @@ src/photo-tower.js    Photo tower explorer with the SVG floor overlay
 src/tower.js          Three.js massing model (fallback, ?view=3d)
 src/viewer.js         360 viewer, hotspots, gyroscope, dev mode
 src/plans.js          Indicative SVG plans and floor key plan
-src/cost.js           Cost sheet and EMI calculator
+src/cost.js           Indicative cost sheet
 src/lead.js           Lead gate and webhook
 src/analytics.js      GA4 loader and events
 src/styles.css        All styles
