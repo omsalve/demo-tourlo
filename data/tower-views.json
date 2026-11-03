@@ -1,0 +1,44 @@
+{
+  "_help": "Each view is one photo angle with a dusk and a day image of identical framing. faces lists the visible facades as four corners in image pixels: tl and tr are the top of the 24th floor, bl and br the bottom of the 1st floor (top of the lobby). Floors are split evenly between them. Open the site with ?dev=1 and click the photo to log pixel coordinates.",
+  "floors": 24,
+  "width": 1672,
+  "height": 941,
+  "views": [
+    {
+      "id": "1",
+      "dusk": "assets/landing/hero_1_dusk.jpg",
+      "day": "assets/landing/hero_1_day.jpg",
+      "faces": [
+        { "tl": [699, 191], "tr": [835, 94], "br": [835, 721], "bl": [699, 723] },
+        { "tl": [835, 94], "tr": [977, 203], "br": [977, 726], "bl": [835, 721] }
+      ]
+    },
+    {
+      "id": "2",
+      "dusk": "assets/landing/hero_2_dusk.jpg",
+      "day": "assets/landing/hero_2_day.jpg",
+      "faces": [
+        { "tl": [671, 188], "tr": [838, 97], "br": [838, 721], "bl": [671, 729] },
+        { "tl": [838, 97], "tr": [997, 194], "br": [997, 729], "bl": [838, 721] }
+      ]
+    },
+    {
+      "id": "3",
+      "dusk": "assets/landing/hero_3_dusk.jpg",
+      "day": "assets/landing/hero_3_day.jpg",
+      "faces": [
+        { "tl": [672, 206], "tr": [835, 103], "br": [835, 717], "bl": [672, 720] },
+        { "tl": [835, 103], "tr": [997, 209], "br": [997, 726], "bl": [835, 717] }
+      ]
+    },
+    {
+      "id": "4",
+      "dusk": "assets/landing/hero_4_dusk.jpg",
+      "day": "assets/landing/hero_4_day.jpg",
+      "faces": [
+        { "tl": [671, 212], "tr": [838, 103], "br": [838, 715], "bl": [671, 721] },
+        { "tl": [838, 103], "tr": [997, 216], "br": [997, 723], "bl": [838, 715] }
+      ]
+    }
+  ]
+}

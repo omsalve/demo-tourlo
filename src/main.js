@@ -62,6 +62,7 @@ async function boot() {
   }
   state.inventory = inventory;
   state.tours = hotspots.tours;
+  for (const [id, t] of Object.entries(state.tours)) t.id = id;
   for (const u of inventory.units) {
     if (!state.byFloor.has(u.floor)) state.byFloor.set(u.floor, []);
     state.byFloor.get(u.floor).push(u);
@@ -73,18 +74,14 @@ async function boot() {
   checkBalcony();
 
   try {
-    const { Tower } = await import('./tower.js');
-    tower = new Tower($('#tower-canvas'), {
-      onFloorClick: (f) => lead.guard(() => openFloor(f, 'tower')) && openFloor(f, 'tower'),
-      onFloorHover: showFloorTip,
-      onAmenityPosition: placeAmenity,
-    });
+    tower = await createTower();
   } catch (e) {
     console.error(e);
-    $('#boot-loader').innerHTML = '<span class="wordmark">Tourlo</span><p class="error-note">This device could not start 3D graphics. Please try a recent version of Chrome or Safari.</p>';
+    $('#boot-loader').innerHTML = '<span class="wordmark">Tourlo</span><p class="error-note">This device could not start the tower view. Please try a recent version of Chrome or Safari.</p>';
     return;
   }
-  setupAmenityHotspot();
+  setupSiteNav();
+  setupIntro();
   setupDayNight();
   setupPanel();
   setupFilters();
@@ -94,10 +91,52 @@ async function boot() {
     updateInset();
   });
 
+  if (!state.photo) hideBootLoader();
+}
+
+function hideBootLoader() {
+  const el = $('#boot-loader');
+  if (!el) return;
   requestAnimationFrame(() => {
-    $('#boot-loader').classList.add('is-done');
-    setTimeout(() => $('#boot-loader').remove(), 700);
+    el.classList.add('is-done');
+    setTimeout(() => el.remove(), 700);
   });
+}
+
+// Photoreal stills by default; the Three.js massing model with ?view=3d or if the stills cannot load.
+async function createTower() {
+  const handlers = {
+    onFloorClick: (f) => lead.guard(() => openFloor(f, 'tower')) && openFloor(f, 'tower'),
+    onFloorHover: showFloorTip,
+  };
+  const want3d = new URLSearchParams(location.search).get('view') === '3d';
+  if (!want3d) {
+    try {
+      const views = await fetch(url('data/tower-views.json')).then((r) => r.json());
+      const { PhotoTower } = await import('./photo-tower.js');
+      state.photo = true;
+      $('#tower-canvas').hidden = true;
+      const t = new PhotoTower(app, views, {
+        ...handlers,
+        onReady: () => {
+          hideBootLoader();
+          setTimeout(() => t.sweep(), 500);
+        },
+      });
+      app.insertBefore(t.stage, $('#tower-labels'));
+      t.onRotate = (view) => track('view_rotate', { view });
+      setNight(t.defaultNight);
+      return t;
+    } catch (e) {
+      console.warn('Photo tower unavailable, falling back to 3D', e);
+      state.photo = false;
+      $('#tower-canvas').hidden = false;
+    }
+  }
+  const { Tower } = await import('./tower.js');
+  const t = new Tower($('#tower-canvas'), { ...handlers, onAmenityPosition: placeAmenity });
+  setupAmenityHotspot();
+  return t;
 }
 
 /* ---------------- CTA, toast ---------------- */
@@ -133,7 +172,7 @@ function setupAmenityHotspot() {
   el.type = 'button';
   el.className = 'amenity-hotspot';
   el.innerHTML = `<span class="dot">${ICON.leaf}</span><span>Landscaped Garden</span>`;
-  el.addEventListener('click', () => openTour('amenity'));
+  el.addEventListener('click', () => openTour('site', 'ext_podium'));
   $('#tower-labels').appendChild(el);
   state.amenityEl = el;
 }
@@ -160,15 +199,70 @@ function showFloorTip(floor, x, y) {
 }
 
 function setupDayNight() {
-  const btn = $('#btn-daynight');
-  btn.addEventListener('click', () => {
-    state.night = !state.night;
-    app.classList.toggle('is-night', state.night);
-    btn.setAttribute('aria-pressed', String(state.night));
-    btn.setAttribute('aria-label', state.night ? 'Switch to day view' : 'Switch to night view');
-    tower.setNight(state.night);
+  $('#btn-daynight').addEventListener('click', () => {
+    setNight(!state.night);
     toast(state.night ? 'Night view' : 'Day view');
   });
+}
+
+function setNight(on) {
+  const btn = $('#btn-daynight');
+  state.night = on;
+  app.classList.toggle('is-night', on);
+  btn.setAttribute('aria-pressed', String(on));
+  btn.setAttribute('aria-label', on ? 'Switch to day view' : 'Switch to night view');
+  tower?.setNight(on);
+}
+
+const SITE_STOPS = [
+  ['ext_plaza', 'Arrival plaza'],
+  ['ext_lobby', 'Lobby'],
+  ['ext_podium', 'Podium garden'],
+  ['ext_rooftop', 'Rooftop'],
+  ['ext_aerial', 'Aerial view'],
+  ['ext_station', 'Metro station'],
+];
+
+function setupSiteNav() {
+  const nav = document.createElement('nav');
+  nav.className = 'site-nav';
+  nav.setAttribute('aria-label', 'Walk the site');
+  nav.innerHTML = `<span class="site-nav-label">Walk the site</span>${SITE_STOPS.map(
+    ([id, label]) => `<button type="button" class="site-chip" data-room="${id}">${ICON.pano}${label}</button>`
+  ).join('')}`;
+  nav.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-room]');
+    if (b) openTour('site', b.dataset.room);
+  });
+  $('.bottom-controls').before(nav);
+}
+
+function setupIntro() {
+  if (!state.photo || session.get('tourlo_intro_seen') === '1') return;
+  const el = document.createElement('section');
+  el.className = 'intro-card';
+  el.innerHTML = `
+    <span class="eyebrow">Tourlo Demo Residences, Mumbai</span>
+    <h1>24 storeys of light, greenery and city views</h1>
+    <p>3 BHK residences and 4 BHK sky villas beside the metro. Tap any floor to see live availability, or walk the site in 360.</p>
+    <div class="intro-actions">
+      <button class="btn btn-gold" type="button" data-intro="explore">Explore the tower</button>
+      <button class="btn btn-ghost" type="button" data-intro="walk">Walk the site</button>
+    </div>`;
+  const close = () => {
+    session.set('tourlo_intro_seen', '1');
+    el.classList.add('is-leaving');
+    setTimeout(() => el.remove(), 400);
+  };
+  el.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-intro]')?.dataset.intro;
+    if (!a) return;
+    close();
+    if (a === 'explore') tower.sweep?.();
+    if (a === 'walk') openTour('site', 'ext_plaza');
+  });
+  app.querySelector('.photo-stage')?.addEventListener('pointerdown', close, { once: true });
+  app.appendChild(el);
 }
 
 function updateHint() {
@@ -570,6 +664,12 @@ async function ensureViewer() {
       state.roomsSeen.add(room.id);
       track('pano_open', { tour: state.tourId, room: room.id });
     },
+    onTourLink: (tourId, roomId) => {
+      const tour = state.tours?.[tourId];
+      if (!tour) return;
+      state.tourId = tourId;
+      viewer.start(tour, roomId);
+    },
     onClose: () => {
       tower.setActive(true);
       if (session.get('tourlo_final_shown') !== '1') {
@@ -581,20 +681,21 @@ async function ensureViewer() {
   return viewer;
 }
 
-async function openTour(tourId) {
+async function openTour(tourId, roomId) {
   const tour = state.tours?.[tourId];
   if (!tour) return;
+  const startRoom = roomId || tour.rooms[0].id;
   const go = async () => {
     // A second room (beyond the first ever viewed) counts as the gate trigger.
-    if (!lead.unlocked && state.roomsSeen.size >= 1 && !state.roomsSeen.has(tour.rooms[0].id)) {
+    if (!lead.unlocked && state.roomsSeen.size >= 1 && !state.roomsSeen.has(startRoom)) {
       lead.trigger('second_room');
-      lead.pending = () => openTour(tourId);
+      lead.pending = () => openTour(tourId, roomId);
       return;
     }
     state.tourId = tourId;
     const v = await ensureViewer();
     tower.setActive(false);
-    v.start(tour);
+    v.start(tour, startRoom);
   };
   if (lead.guard(go)) go();
 }

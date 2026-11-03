@@ -1,6 +1,181 @@
 {
-  "_help": "yaw: degrees left/right from the centre of the pano (positive is to the right, range -180 to 180). pitch: degrees up/down (positive is up, range -90 to 90). Open the site with ?dev=1 and click inside a pano to log and copy the yaw/pitch of any point.",
+  "_help": "yaw: degrees left/right from the centre of the pano (positive is to the right, range -180 to 180). pitch: degrees up/down (positive is up, range -90 to 90). Open the site with ?dev=1 and click inside a pano to log and copy the yaw/pitch of any point. Add \"tour\" to a hotspot to jump into another tour (for example from the lobby into an apartment). A hotspot without \"to\" is shown as an information label.",
   "tours": {
+    "site": {
+      "title": "Tourlo Demo Residences, the site",
+      "rooms": [
+        {
+          "id": "ext_plaza",
+          "label": "Arrival plaza",
+          "file": "ext_plaza.jpg",
+          "initialYaw": 0,
+          "initialPitch": 8,
+          "hotspots": [
+            {
+              "to": "ext_lobby",
+              "label": "Enter the lobby",
+              "yaw": 0,
+              "pitch": -8
+            },
+            {
+              "to": "ext_podium",
+              "label": "Podium garden",
+              "yaw": 110,
+              "pitch": -4
+            },
+            {
+              "to": "ext_station",
+              "label": "Metro station",
+              "yaw": -130,
+              "pitch": -3
+            },
+            {
+              "to": "ext_rooftop",
+              "label": "Rooftop terrace",
+              "yaw": 0,
+              "pitch": 62
+            },
+            {
+              "to": "ext_aerial",
+              "label": "Aerial view",
+              "yaw": 180,
+              "pitch": 40
+            }
+          ]
+        },
+        {
+          "id": "ext_lobby",
+          "label": "Lobby",
+          "file": "ext_lobby.jpg",
+          "initialYaw": 150,
+          "initialPitch": 0,
+          "hotspots": [
+            {
+              "to": "ext_plaza",
+              "label": "Back to the plaza",
+              "yaw": 0,
+              "pitch": -4
+            },
+            {
+              "to": "typeA_living",
+              "tour": "typeA",
+              "label": "Type A, 3 BHK",
+              "yaw": 165,
+              "pitch": -2
+            },
+            {
+              "to": "typeB_living",
+              "tour": "typeB",
+              "label": "Type B, 4 BHK sky villa",
+              "yaw": -165,
+              "pitch": -2
+            },
+            {
+              "to": "ext_rooftop",
+              "label": "Lift to the rooftop",
+              "yaw": -120,
+              "pitch": -2
+            }
+          ]
+        },
+        {
+          "id": "ext_podium",
+          "label": "Podium garden",
+          "file": "ext_podium.jpg",
+          "initialYaw": -40,
+          "initialPitch": 4,
+          "hotspots": [
+            {
+              "to": "ext_plaza",
+              "label": "Arrival plaza",
+              "yaw": -88,
+              "pitch": -8
+            },
+            {
+              "label": "Lap pool",
+              "yaw": 60,
+              "pitch": -12
+            }
+          ]
+        },
+        {
+          "id": "ext_rooftop",
+          "label": "Rooftop terrace",
+          "file": "ext_rooftop.jpg",
+          "initialYaw": 0,
+          "initialPitch": -6,
+          "hotspots": [
+            {
+              "to": "ext_lobby",
+              "label": "Lift to the lobby",
+              "yaw": 180,
+              "pitch": -6
+            },
+            {
+              "to": "ext_aerial",
+              "label": "Aerial view",
+              "yaw": 90,
+              "pitch": 25
+            },
+            {
+              "label": "Infinity edge",
+              "yaw": 75,
+              "pitch": -14
+            }
+          ]
+        },
+        {
+          "id": "ext_aerial",
+          "label": "Aerial view",
+          "file": "ext_aerial.jpg",
+          "initialYaw": 15,
+          "initialPitch": -12,
+          "hotspots": [
+            {
+              "to": "ext_plaza",
+              "label": "Arrival plaza",
+              "yaw": -43,
+              "pitch": -58
+            },
+            {
+              "label": "Metro line, 2 min walk",
+              "yaw": -145,
+              "pitch": -20
+            },
+            {
+              "label": "Arterial road to the airport",
+              "yaw": 150,
+              "pitch": -36
+            },
+            {
+              "label": "Podium pool",
+              "yaw": 38,
+              "pitch": -44
+            }
+          ]
+        },
+        {
+          "id": "ext_station",
+          "label": "Metro station",
+          "file": "ext_station.jpg",
+          "initialYaw": 0,
+          "initialPitch": 6,
+          "hotspots": [
+            {
+              "to": "ext_plaza",
+              "label": "Walk to the plaza",
+              "yaw": 0,
+              "pitch": -4
+            },
+            {
+              "label": "Metro, 2 min walk",
+              "yaw": 115,
+              "pitch": -8
+            }
+          ]
+        }
+      ]
+    },
     "typeA": {
       "title": "Type A, 3 BHK Residence",
       "rooms": [
@@ -11,8 +186,25 @@
           "initialYaw": -10,
           "initialPitch": -4,
           "hotspots": [
-            { "to": "typeA_living_dining", "label": "Living and dining", "yaw": 0, "pitch": -6 },
-            { "to": "typeA_study", "label": "Study", "yaw": 40, "pitch": -4 }
+            {
+              "to": "typeA_living_dining",
+              "label": "Living and dining",
+              "yaw": 0,
+              "pitch": -6
+            },
+            {
+              "to": "typeA_study",
+              "label": "Study",
+              "yaw": 40,
+              "pitch": -4
+            },
+            {
+              "to": "ext_lobby",
+              "tour": "site",
+              "label": "Back to the lobby",
+              "yaw": 180,
+              "pitch": -4
+            }
           ]
         },
         {
@@ -22,8 +214,18 @@
           "initialYaw": -30,
           "initialPitch": -4,
           "hotspots": [
-            { "to": "typeA_living", "label": "Living", "yaw": -80, "pitch": -10 },
-            { "to": "typeA_study", "label": "Study", "yaw": 66, "pitch": -4 }
+            {
+              "to": "typeA_living",
+              "label": "Living",
+              "yaw": -80,
+              "pitch": -10
+            },
+            {
+              "to": "typeA_study",
+              "label": "Study",
+              "yaw": 66,
+              "pitch": -4
+            }
           ]
         },
         {
@@ -33,7 +235,12 @@
           "initialYaw": 0,
           "initialPitch": -4,
           "hotspots": [
-            { "to": "typeA_living_dining", "label": "Living and dining", "yaw": -60, "pitch": -4 }
+            {
+              "to": "typeA_living_dining",
+              "label": "Living and dining",
+              "yaw": -60,
+              "pitch": -4
+            }
           ]
         }
       ]
@@ -48,8 +255,25 @@
           "initialYaw": 0,
           "initialPitch": -4,
           "hotspots": [
-            { "to": "typeB_lounge", "label": "Double height lounge", "yaw": -30, "pitch": -4 },
-            { "to": "typeB_stair_dining", "label": "Stair and dining", "yaw": 42, "pitch": -4 }
+            {
+              "to": "typeB_lounge",
+              "label": "Double height lounge",
+              "yaw": -30,
+              "pitch": -4
+            },
+            {
+              "to": "typeB_stair_dining",
+              "label": "Stair and dining",
+              "yaw": 42,
+              "pitch": -4
+            },
+            {
+              "to": "ext_lobby",
+              "tour": "site",
+              "label": "Back to the lobby",
+              "yaw": 180,
+              "pitch": -4
+            }
           ]
         },
         {
@@ -59,8 +283,18 @@
           "initialYaw": -10,
           "initialPitch": 0,
           "hotspots": [
-            { "to": "typeB_stair_dining", "label": "Stair and dining", "yaw": 38, "pitch": -2 },
-            { "to": "typeB_living", "label": "Living", "yaw": -40, "pitch": -8 }
+            {
+              "to": "typeB_stair_dining",
+              "label": "Stair and dining",
+              "yaw": 38,
+              "pitch": -2
+            },
+            {
+              "to": "typeB_living",
+              "label": "Living",
+              "yaw": -40,
+              "pitch": -8
+            }
           ]
         },
         {
@@ -70,8 +304,18 @@
           "initialYaw": 0,
           "initialPitch": -2,
           "hotspots": [
-            { "to": "typeB_living", "label": "Living", "yaw": -110, "pitch": -3 },
-            { "to": "typeB_lounge", "label": "Lounge", "yaw": 10, "pitch": -2 }
+            {
+              "to": "typeB_living",
+              "label": "Living",
+              "yaw": -110,
+              "pitch": -3
+            },
+            {
+              "to": "typeB_lounge",
+              "label": "Lounge",
+              "yaw": 10,
+              "pitch": -2
+            }
           ]
         }
       ]
@@ -86,7 +330,12 @@
           "initialYaw": 0,
           "initialPitch": 0,
           "hotspots": [
-            { "to": "amenity_garden_2", "label": "Clubhouse lawn", "yaw": 0, "pitch": -10 }
+            {
+              "to": "amenity_garden_2",
+              "label": "Clubhouse lawn",
+              "yaw": 0,
+              "pitch": -10
+            }
           ]
         },
         {
@@ -96,7 +345,12 @@
           "initialYaw": -30,
           "initialPitch": 0,
           "hotspots": [
-            { "to": "amenity_garden_1", "label": "Garden lawn", "yaw": 90, "pitch": -8 }
+            {
+              "to": "amenity_garden_1",
+              "label": "Garden lawn",
+              "yaw": 90,
+              "pitch": -8
+            }
           ]
         }
       ]

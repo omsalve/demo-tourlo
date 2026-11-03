@@ -25,10 +25,11 @@ function yawPitchFromDir(v) {
 }
 
 export class PanoViewer {
-  constructor(root, { onRoomChange, onClose, canEnterRoom } = {}) {
+  constructor(root, { onRoomChange, onClose, canEnterRoom, onTourLink } = {}) {
     this.root = root;
     this.onRoomChange = onRoomChange;
     this.onClose = onClose;
+    this.onTourLink = onTourLink;
     this.canEnterRoom = canEnterRoom || (() => true);
     this.canvas = root.querySelector('#viewer-canvas');
     this.hotspotLayer = root.querySelector('#viewer-hotspots');
@@ -76,19 +77,24 @@ export class PanoViewer {
 
   /* ---------- Tours ---------- */
 
+  // Also used to jump between tours while open (for example lobby to apartment).
   start(tour, roomId) {
+    const wasOpen = this.open;
     this.tour = tour;
+    this.tourId = tour.id;
     this.root.hidden = false;
     this.open = true;
-    this.hintEl.classList.remove('is-hidden');
-    clearTimeout(this.hintTimer);
-    this.hintTimer = setTimeout(() => this.hintEl.classList.add('is-hidden'), 3500);
     this.root.querySelector('#viewer-tour').textContent = tour.title;
     this.renderRooms();
-    this.resize();
-    this.setupGyroButton();
-    requestAnimationFrame(this.frame);
-    this.go(roomId || tour.rooms[0].id, { initial: true });
+    if (!wasOpen) {
+      this.hintEl.classList.remove('is-hidden');
+      clearTimeout(this.hintTimer);
+      this.hintTimer = setTimeout(() => this.hintEl.classList.add('is-hidden'), 3500);
+      this.resize();
+      this.setupGyroButton();
+      requestAnimationFrame(this.frame);
+    }
+    this.go(roomId || tour.rooms[0].id, { initial: !wasOpen });
   }
 
   close() {
@@ -224,16 +230,21 @@ export class PanoViewer {
 
   buildHotspots() {
     this.hotspots = (this.room.hotspots || []).map((h) => {
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'pano-hotspot';
-      el.innerHTML = `<span class="ring">${ARROW}</span><span class="lbl">${h.label}</span>`;
-      el.setAttribute('aria-label', `Go to ${h.label}`);
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.go(h.to);
-      });
-      el.addEventListener('pointerdown', (e) => e.stopPropagation());
+      // A hotspot without "to" is an information label (for example a landmark in the aerial view).
+      const el = document.createElement(h.to ? 'button' : 'div');
+      el.className = h.to ? 'pano-hotspot' : 'pano-hotspot is-info';
+      el.innerHTML = h.to ? `<span class="ring">${ARROW}</span><span class="lbl">${h.label}</span>` : `<span class="pin"></span><span class="lbl">${h.label}</span>`;
+      if (h.to) {
+        el.type = 'button';
+        el.setAttribute('aria-label', `Go to ${h.label}`);
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // "tour" links into another tour, for example from the lobby into an apartment.
+          if (h.tour && h.tour !== this.tourId) this.onTourLink?.(h.tour, h.to);
+          else this.go(h.to);
+        });
+        el.addEventListener('pointerdown', (e) => e.stopPropagation());
+      }
       this.hotspotLayer.appendChild(el);
       return { el, dir: dirFromYawPitch(h.yaw, h.pitch) };
     });

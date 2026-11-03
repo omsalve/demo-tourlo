@@ -2,14 +2,16 @@
 
 An interactive sales gallery demo for **Tourlo Demo Residences** (fictional, Mumbai), built to embed on tourlo.in.
 
-- 3D tower (Three.js) with 24 floors, each tappable, day and night modes, and a Landscaped Garden hotspot on the podium
+- Photoreal tower explorer: 4 rendered angles with day and dusk versions, and an SVG floor overlay so every one of the 24 floors is tappable on the photo
+- "Walk the site" 360 tour of the plaza, lobby, podium garden, rooftop, aerial view and metro station, linked into the apartment interiors
+- A Three.js massing model of the tower as a fallback (`?view=3d`)
 - Live inventory from `data/inventory.json` with filters (BHK, status, price, facing). Matching floors glow on the tower
 - Unit view with an indicative SVG plan, specs, an indicative cost sheet and an EMI calculator
 - 360 viewer with drag, pinch or scroll zoom, gyroscope on phones, room thumbnails and hotspots between rooms
 - Lead form after about 60 seconds of interaction or when a second 360 room is opened
 - Optional GA4 events and a persistent "Book a full live demo" call to action
 
-Vite and vanilla JS. No backend. The initial load is about 650 KB (gzip about 200 KB); panos load only when opened.
+Vite and vanilla JS. No backend. The landing loads about 0.9 MB (one hero photo plus code); other angles and panos load as they are needed.
 
 ## Run locally
 
@@ -104,13 +106,29 @@ To regenerate fresh dummy data (overwrites the file):
 npm run inventory
 ```
 
+## Photo landing (tower explorer)
+
+The landing uses the stills in `assets/landing/` (`hero_1_dusk.jpg`, `hero_1_day.jpg` and so on, one dusk and one day image per angle with identical framing) and `data/tower-views.json`.
+
+For each view, `faces` lists the visible facades as four corners in image pixels: `tl` and `tr` at the top of the 24th floor, `bl` and `br` at the bottom of the 1st floor (the top of the lobby). The app splits each facade into 24 floors with a perspective correct mapping, so the outlines follow the photo.
+
+To replace or re-measure an image:
+
+1. Put the new JPGs in `assets/landing/` with the same names (or add a view to `tower-views.json`).
+2. Open the site with `?dev=1`, go to that angle and click each facade corner. The pixel position is logged and copied.
+3. Update the corners in `data/tower-views.json` and refresh.
+
+All images must keep the size in `tower-views.json` (`width` and `height`). Open with `?view=3d` to see the Three.js massing model instead.
+
 ## Editing 360 rooms and hotspots
 
-`data/hotspots.json` defines three tours (`typeA`, `typeB`, `amenity`). Each room has an `id`, a `label`, a `file` name, an optional starting `initialYaw` and `initialPitch`, and a list of `hotspots`:
+`data/hotspots.json` defines the tours: `site` (exterior walk), `typeA`, `typeB` and `amenity` (the original garden panos, kept for reference). Each room has an `id`, a `label`, a `file` name, an optional starting `initialYaw` and `initialPitch`, and a list of `hotspots`:
 
 ```json
 { "to": "typeA_study", "label": "Study", "yaw": 40, "pitch": -4 }
 ```
+
+Add `"tour": "typeA"` to a hotspot to jump into another tour, as the lobby does into the apartments. A hotspot without `to` is shown as an information label, as in the aerial view.
 
 `yaw` is degrees left or right of the centre of the pano image (positive is right, range -180 to 180). `pitch` is degrees up or down (positive is up).
 
@@ -129,6 +147,7 @@ Keep the same file names and the app picks them up with no code changes.
    - `typeA_living.jpg`, `typeA_living_dining.jpg`, `typeA_study.jpg`
    - `typeB_living.jpg`, `typeB_lounge.jpg`, `typeB_stair_dining.jpg`
    - `amenity_garden_1.jpg`, `amenity_garden_2.jpg`
+   - `ext_plaza.jpg`, `ext_lobby.jpg`, `ext_podium.jpg`, `ext_rooftop.jpg`, `ext_aerial.jpg`, `ext_station.jpg`
 2. Rebuild the phone versions (2048x1024) and room thumbnails:
 
    ```bash
@@ -144,14 +163,15 @@ To add or rename rooms, add the JPG and a matching room entry in `data/hotspots.
 
 ### Balcony view
 
-If `assets/views/balcony_view.jpg` exists, Type A units show a "View from balcony" button that opens the image full screen. If the file is missing, the button stays hidden.
+`assets/views/balcony_view.jpg` is in place, so Type A units show the button. If `assets/views/balcony_view.jpg` exists, Type A units show a "View from balcony" button that opens the image full screen. If the file is missing, the button stays hidden.
 
 ## Project structure
 
 ```
 index.html            App shell
 src/main.js           App wiring: panels, filters, unit view, tours
-src/tower.js          Three.js tower, day and night, floor picking
+src/photo-tower.js    Photo tower explorer with the SVG floor overlay
+src/tower.js          Three.js massing model (fallback, ?view=3d)
 src/viewer.js         360 viewer, hotspots, gyroscope, dev mode
 src/plans.js          Indicative SVG plans and floor key plan
 src/cost.js           Cost sheet and EMI calculator
@@ -160,6 +180,7 @@ src/analytics.js      GA4 loader and events
 src/styles.css        All styles
 data/inventory.json   Units and pricing (runtime)
 data/hotspots.json    Tours, rooms and hotspots (runtime)
+data/tower-views.json Photo angles and facade corners (runtime)
 assets/               Panos, phone panos, thumbnails, optional views
 scripts/              Inventory generator and pano preparation
 ```

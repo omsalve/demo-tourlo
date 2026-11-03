@@ -1509,7 +1509,7 @@ input[type='range']:focus-visible::-webkit-slider-thumb {
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(90px + var(--safe-b));
+  bottom: calc(140px + var(--safe-b));
   z-index: 60;
   max-width: calc(100% - 32px);
   padding: 10px 16px;
@@ -1654,4 +1654,343 @@ input[type='range']:focus-visible::-webkit-slider-thumb {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---------- Photo tower explorer ---------- */
+
+.photo-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0d1220;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.photo-world {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.photo-view {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.photo-view.is-active {
+  opacity: 1;
+}
+
+.photo-view img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.photo-view .ph-day {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.is-day .photo-view .ph-day {
+  opacity: 1;
+}
+
+.floor-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.floor-overlay .floor polygon {
+  fill: rgba(201, 164, 92, 0);
+  stroke: rgba(255, 228, 170, 0);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: all;
+  cursor: pointer;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.floor-overlay .floor.is-hover polygon {
+  fill: rgba(201, 164, 92, 0.32);
+  stroke: rgba(255, 228, 170, 0.9);
+}
+
+.floor-overlay .floor.is-sweep polygon {
+  fill: rgba(255, 240, 210, 0.3);
+}
+
+.floor-overlay.is-filtering .floor.is-match polygon {
+  fill: rgba(201, 164, 92, 0.34);
+  stroke: rgba(255, 228, 170, 0.55);
+  animation: floor-pulse 2.2s ease-in-out infinite;
+}
+
+.floor-overlay .floor.is-selected polygon {
+  fill: rgba(201, 164, 92, 0.55);
+  stroke: #f6dca0;
+  stroke-width: 2;
+  animation: none;
+}
+
+@keyframes floor-pulse {
+  50% {
+    fill: rgba(201, 164, 92, 0.18);
+  }
+}
+
+.photo-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border-radius: 50%;
+  border: 1px solid rgba(243, 238, 230, 0.35);
+  background: rgba(11, 11, 12, 0.45);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.photo-arrow:hover {
+  border-color: var(--gold);
+  background: rgba(11, 11, 12, 0.7);
+}
+
+.photo-arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+.photo-arrow.prev {
+  left: 12px;
+}
+
+.photo-arrow.next {
+  right: 12px;
+}
+
+.photo-dots {
+  position: absolute;
+  left: 50%;
+  top: calc(74px + var(--safe-t));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.photo-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(243, 238, 230, 0.45);
+  transition: width 0.3s, background 0.3s;
+}
+
+.photo-dots span.on {
+  width: 18px;
+  background: var(--gold);
+}
+
+/* ---------- Walk the site chips ---------- */
+
+.site-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(80px + var(--safe-b));
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  transition: opacity 0.3s;
+}
+
+.site-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.site-nav-label {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+  margin-right: 2px;
+}
+
+.site-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(243, 238, 230, 0.28);
+  background: rgba(11, 11, 12, 0.55);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.site-chip:hover {
+  border-color: var(--gold);
+  background: rgba(11, 11, 12, 0.75);
+}
+
+.site-chip svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gold);
+}
+
+/* ---------- Intro card ---------- */
+
+.intro-card {
+  position: absolute;
+  z-index: 6;
+  left: 16px;
+  right: 16px;
+  bottom: calc(132px + var(--safe-b));
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(11, 11, 12, 0.72);
+  border: 1px solid rgba(243, 238, 230, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  animation: rise 0.6s 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition: opacity 0.4s, transform 0.4s;
+}
+
+.intro-card.is-leaving {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.intro-card h1 {
+  margin: 6px 0 8px;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.intro-card p {
+  margin: 0 0 16px;
+  color: rgba(243, 238, 230, 0.78);
+  font-size: 14px;
+}
+
+.intro-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.intro-actions .btn {
+  flex: 1 1 auto;
+}
+
+@media (min-width: 900px) {
+  .intro-card {
+    left: 32px;
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    width: 400px;
+    transform: translateY(-50%);
+    padding: 28px;
+  }
+
+  .intro-card.is-leaving {
+    transform: translateY(-46%);
+  }
+
+  .intro-card h1 {
+    font-size: 30px;
+  }
+
+  .site-nav {
+    bottom: calc(66px + var(--safe-b));
+    justify-content: safe center;
+    padding: 0 220px;
+  }
+
+  .photo-arrow {
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+  }
+
+  .photo-arrow.prev {
+    left: 24px;
+  }
+
+  .photo-arrow.next {
+    right: 24px;
+  }
+
+  .has-sheet .photo-arrow.next {
+    right: 460px;
+  }
+
+  .has-sheet .photo-arrow.prev {
+    left: 24px;
+  }
+}
+
+@media (max-width: 899px) {
+  .has-sheet .site-nav,
+  .has-sheet .photo-arrow,
+  .has-sheet .photo-dots {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Information labels inside panos (no link). */
+.pano-hotspot.is-info {
+  pointer-events: none;
+}
+
+.pano-hotspot.is-info .pin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 6px rgba(201, 164, 92, 0.3);
+}
+
+.floor-overlay .floor,
+.floor-overlay .floor polygon {
+  outline: none;
 }

@@ -22,7 +22,7 @@ for (const file of files) {
   const mOut = path.join(mobile, file);
   const tOut = path.join(thumbs, file);
   if (force || !(await exists(mOut))) {
-    await sharp(input).resize(2048, 1024).jpeg({ quality: 78, progressive: true, mozjpeg: true }).toFile(mOut);
+    await sharp(input).resize({ width: 2048, height: 1024, withoutEnlargement: true }).jpeg({ quality: 78, progressive: true, mozjpeg: true }).toFile(mOut);
     console.log('mobile  ', file);
   }
   if (force || !(await exists(tOut))) {
