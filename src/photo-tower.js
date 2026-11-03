@@ -50,6 +50,8 @@ export class PhotoTower {
     this.viewIndex = 0;
     this.selectedFloor = null;
     this.filterMatches = null;
+    this.availability = null;
+    this.unit = null;
     this.inset = { right: 0, bottom: 0 };
 
     const stage = document.createElement('div');
@@ -132,19 +134,69 @@ export class PhotoTower {
     for (let f = 1; f <= n; f++) {
       const vt = 1 - f / n;
       const vb = 1 - (f - 1) / n;
+      let sumX = 0;
       let sumY = 0;
       const polys = faces
         .map((P) => {
           const pts = [P(0, vt), P(1, vt), P(1, vb), P(0, vb)];
+          sumX += pts.reduce((s, p) => s + p[0], 0) / 4;
           sumY += pts.reduce((s, p) => s + p[1], 0) / 4;
           return `<polygon points="${pts.map(fmt).join(' ')}"/>`;
         })
         .join('');
-      this.floorCenters.set(f, sumY / faces.length);
+      this.floorCenters.set(f, { x: sumX / faces.length, y: sumY / faces.length });
       svg += `<g class="floor" data-floor="${f}">${polys}</g>`;
     }
+    svg += '<g class="unit-hl" aria-hidden="true"></g>';
     this.svg.innerHTML = svg;
     this.applyStates();
+    this.drawUnit();
+  }
+
+  // The part of each visible facade that belongs to a unit, as [u0, u1] across the face.
+  // Faces carry a compass "side" in tower-views.json (left face S, right face E here).
+  // Type A: one home per side, so the whole face. Type B: two homes facing E and W; the
+  // E home also wraps the half of the S face nearest the E corner, the W home the other half.
+  unitSpans(unit) {
+    return this.view.faces.map((face) => {
+      if (unit.type !== 'B') return face.side === unit.facing ? [0, 1] : null;
+      if (face.side === unit.facing) return [0, 1];
+      if (face.side === 'S' || face.side === 'N') {
+        // Which end of this face touches the E side depends on where the E face sits in the photo.
+        const eIndex = this.view.faces.findIndex((f) => f.side === 'E');
+        const myIndex = this.view.faces.indexOf(face);
+        const eOnRight = eIndex > myIndex;
+        const towardE = eOnRight ? [0.5, 1] : [0, 0.5];
+        const towardW = eOnRight ? [0, 0.5] : [0.5, 1];
+        return unit.facing === 'E' ? towardE : unit.facing === 'W' ? towardW : null;
+      }
+      return null;
+    });
+  }
+
+  drawUnit() {
+    const layer = this.svg.querySelector('.unit-hl');
+    if (!layer) return;
+    const u = this.unit;
+    this.svg.classList.toggle('has-unit', !!u && this.unitSpans(u).some(Boolean));
+    if (!u) {
+      layer.innerHTML = '';
+      return;
+    }
+    const n = this.floors;
+    const vt = 1 - u.floor / n;
+    const vb = 1 - (u.floor - 1) / n;
+    const fmt = ([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
+    const spans = this.unitSpans(u);
+    layer.innerHTML = this.view.faces
+      .map((face, i) => {
+        const span = spans[i];
+        if (!span) return '';
+        const P = squareToQuad(face);
+        const pts = [P(span[0], vt), P(span[1], vt), P(span[1], vb), P(span[0], vb)];
+        return `<polygon points="${pts.map(fmt).join(' ')}"/>`;
+      })
+      .join('');
   }
 
   applyStates() {
@@ -154,7 +206,20 @@ export class PhotoTower {
       const f = +g.dataset.floor;
       g.classList.toggle('is-selected', f === this.selectedFloor);
       g.classList.toggle('is-match', filtering && !!this.filterMatches.get(f));
+      const av = this.availability?.get(f);
+      g.classList.toggle('av-available', av === 'available');
+      g.classList.toggle('av-held', av === 'held');
+      g.classList.toggle('av-sold', av === 'sold');
     });
+    this.svg.classList.toggle('show-availability', !!this.availability);
+  }
+
+  // Slow push in when the landing opens. Uses the CSS scale property so it stacks with the
+  // translate and zoom transforms, and the floor overlay moves with the photo.
+  playIntro() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    this.world.classList.add('is-intro');
+    this.world.addEventListener('animationend', () => this.world.classList.remove('is-intro'), { once: true });
   }
 
   // A short sweep up the tower on load so visitors see the floors are interactive.
@@ -260,8 +325,23 @@ export class PhotoTower {
 
   selectFloor(floor) {
     this.selectedFloor = floor;
+    if (!floor) this.unit = null;
     this.applyStates();
+    this.drawUnit();
     this.applyInset();
+  }
+
+  // states: Map floor -> 'available' | 'held' | 'sold', or null to hide the colours.
+  setAvailability(states) {
+    this.availability = states;
+    this.applyStates();
+  }
+
+  // Outlines one home on the facade. Returns false when it is on a side hidden in this photo.
+  highlightUnit(unit) {
+    this.unit = unit;
+    this.drawUnit();
+    return !unit || this.unitSpans(unit).some(Boolean);
   }
 
   setInset(right, bottom) {
@@ -269,21 +349,28 @@ export class PhotoTower {
     this.applyInset();
   }
 
-  // Shifts the photo so the tower (or the selected floor) sits in the area not covered by panels.
+  // Keeps the tower in the area not covered by panels, and zooms in on the selected floor.
   applyInset() {
     const { right, bottom } = this.inset;
     const sw = this.stage.clientWidth;
     const sh = this.stage.clientHeight;
-    const scale = Math.max(sw / this.W, sh / this.H);
-    let tx = -right / 2;
-    let ty = 0;
-    if (bottom > 0) {
-      const imgY = this.selectedFloor ? this.floorCenters.get(this.selectedFloor) : this.H * 0.45;
-      const screenY = (imgY - this.H / 2) * scale + sh / 2;
-      const visibleCenter = (sh - bottom) / 2;
-      ty = Math.min(0, Math.max(-bottom, visibleCenter - screenY));
-    }
-    this.world.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
+    const cover = Math.max(sw / this.W, sh / this.H);
+    const s = this.selectedFloor ? (sw < 900 ? 1.3 : 1.4) : 1;
+    const c = this.selectedFloor ? this.floorCenters.get(this.selectedFloor) : { x: this.W / 2, y: this.H * 0.45 };
+    // Where that point sits on screen before the zoom, and where we want it: the middle of the uncovered area.
+    const px = (c.x - this.W / 2) * cover + sw / 2;
+    const py = (c.y - this.H / 2) * cover + sh / 2;
+    const targetX = this.selectedFloor ? (sw - right) / 2 : sw / 2 - right / 2;
+    const targetY = bottom > 0 || this.selectedFloor ? (sh - bottom) / 2 : py;
+    // The zoom scales around the stage centre; solve for the translate that lands the point on target.
+    let tx = targetX - sw / 2 - (px - sw / 2) * s;
+    let ty = targetY - sh / 2 - (py - sh / 2) * s;
+    // Never pull the photo far enough to show an empty edge, except behind the panels.
+    const spareX = ((s - 1) * sw) / 2;
+    const spareY = ((s - 1) * sh) / 2;
+    tx = Math.min(spareX, Math.max(-spareX - right, tx));
+    ty = Math.min(spareY, Math.max(-spareY - bottom, ty));
+    this.world.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${s})`;
   }
 
   setActive() {}

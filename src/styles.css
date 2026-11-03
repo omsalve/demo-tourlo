@@ -1637,8 +1637,25 @@ input[type='range']:focus-visible::-webkit-slider-thumb {
 .photo-world {
   position: absolute;
   inset: 0;
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform;
+}
+
+.photo-world.is-intro {
+  animation: intro-push 5.5s cubic-bezier(0.25, 0.6, 0.2, 1) both;
+}
+
+@keyframes intro-push {
+  from {
+    scale: 1.12;
+    opacity: 0.4;
+  }
+  18% {
+    opacity: 1;
+  }
+  to {
+    scale: 1;
+  }
 }
 
 .photo-view {
@@ -1959,4 +1976,135 @@ input[type='range']:focus-visible::-webkit-slider-thumb {
 .floor-overlay .floor,
 .floor-overlay .floor polygon {
   outline: none;
+}
+
+/* ---------- Availability colours ---------- */
+
+.floor-overlay.show-availability .floor.av-available polygon {
+  fill: rgba(111, 191, 142, 0.34);
+  stroke: rgba(160, 230, 185, 0.7);
+}
+
+.floor-overlay.show-availability .floor.av-held polygon {
+  fill: rgba(224, 165, 72, 0.36);
+  stroke: rgba(245, 200, 130, 0.7);
+}
+
+.floor-overlay.show-availability .floor.av-sold polygon {
+  fill: rgba(184, 101, 91, 0.3);
+  stroke: rgba(220, 150, 140, 0.55);
+}
+
+.floor-overlay.show-availability .floor.is-hover polygon,
+.floor-overlay.show-availability .floor.is-selected polygon {
+  stroke: #f6dca0;
+  stroke-width: 2;
+}
+
+.av-legend {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: calc(76px + var(--safe-t));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(11, 11, 12, 0.7);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.av-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.av-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--s);
+}
+
+/* ---------- Home outlined on the facade ---------- */
+
+.floor-overlay .unit-hl polygon {
+  fill: rgba(246, 220, 160, 0.5);
+  stroke: #fff4d6;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  animation: unit-glow 1.8s ease-in-out infinite;
+}
+
+@keyframes unit-glow {
+  50% {
+    fill: rgba(246, 220, 160, 0.22);
+  }
+}
+
+.facade-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.facade-note svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ---------- Share ---------- */
+
+.share-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.share-row .btn {
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.share-row svg {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 480px) {
+  #btn-availability span,
+  #btn-filters span:not(.badge) {
+    display: none;
+  }
+
+  #btn-availability,
+  #btn-filters {
+    padding: 0 13px;
+  }
+
+  .av-legend {
+    gap: 10px;
+    font-size: 11px;
+    padding: 7px 12px;
+  }
+}
+
+/* With a home outlined, the rest of its floor steps back to a thin line. */
+.floor-overlay.has-unit .floor.is-selected polygon {
+  fill: rgba(201, 164, 92, 0.08);
+  stroke: rgba(246, 220, 160, 0.6);
+  stroke-width: 1;
 }

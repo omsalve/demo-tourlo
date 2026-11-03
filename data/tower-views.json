@@ -1,5 +1,5 @@
 {
-  "_help": "Each view is one photo angle (add more views to enable the rotate arrows) with a dusk and a day image of identical framing. faces lists the visible facades as four corners in image pixels: tl and tr are the top of the 24th floor, bl and br the bottom of the 1st floor (top of the lobby). Floors are split evenly between them. Open the site with ?dev=1 and click the photo to log pixel coordinates.",
+  "_help": "Each view is one photo angle (add more views to enable the rotate arrows) with a dusk and a day image of identical framing. faces lists the visible facades as four corners in image pixels: tl and tr are the top of the 24th floor, bl and br the bottom of the 1st floor (top of the lobby). Floors are split evenly between them. Open the site with ?dev=1 and click the photo to log pixel coordinates. Each face also has a compass \"side\" (N, E, S or W) used to highlight a home on the building.",
   "floors": 24,
   "width": 1672,
   "height": 941,
@@ -25,7 +25,8 @@
           "bl": [
             671,
             721
-          ]
+          ],
+          "side": "S"
         },
         {
           "tl": [
@@ -43,7 +44,8 @@
           "bl": [
             838,
             715
-          ]
+          ],
+          "side": "E"
         }
       ]
     }

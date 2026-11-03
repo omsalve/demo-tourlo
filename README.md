@@ -4,6 +4,10 @@ An interactive sales gallery demo for **Tourlo Demo Residences** (fictional, Mum
 
 - Photoreal tower explorer: one rendered hero with day and dusk versions, and an SVG floor overlay so every one of the 24 floors is tappable on the photo
 - "Walk the site" 360 tour of the plaza, lobby, podium garden, rooftop, aerial view and metro station, linked into the apartment interiors
+- "Availability" toggle colours every floor on the photo (green available, amber only on hold, red sold out)
+- Tapping a floor zooms the photo in on it; opening a home outlines it on the facade
+- Share a home on WhatsApp or copy its link; `?unit=1402` opens straight into that home
+- A slow cinematic push in when the landing opens
 - A Three.js massing model of the tower as a fallback (`?view=3d`)
 - Live inventory from `data/inventory.json` with filters (BHK, status, price, facing). Matching floors glow on the tower
 - Unit view with an indicative SVG plan, specs, and an indicative cost sheet
@@ -117,6 +121,8 @@ To replace or re-measure an image:
 1. Put the new JPGs in `assets/landing/` with the same names (or add a view to `tower-views.json`).
 2. Open the site with `?dev=1`, go to that angle and click each facade corner. The pixel position is logged and copied.
 3. Update the corners in `data/tower-views.json` and refresh.
+
+Each face also has a compass `side` (`S` for the left face and `E` for the right face in the current photo). It decides which part of the facade lights up for a home: Type A homes own the face they look onto, and the Type B E and W villas also wrap half of the S face. Homes on hidden sides show a note instead.
 
 All images must keep the size in `tower-views.json` (`width` and `height`). Open with `?view=3d` to see the Three.js massing model instead.
 

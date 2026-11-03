@@ -16,6 +16,9 @@ const ICON = {
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
   pano: '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="9.5" ry="4.5"/><path d="M12 2.5v19"/><circle cx="12" cy="12" r="9.5"/></svg>',
   view: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg>',
+  share: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>',
+  link: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="1.5"/><path d="M7 8h10M7 13h10M7 18h10"/></svg>',
   leaf: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/></svg>',
 };
 
@@ -85,6 +88,7 @@ async function boot() {
   setupDayNight();
   setupPanel();
   setupFilters();
+  setupAvailability();
 
   window.addEventListener('resize', () => {
     tower.resize();
@@ -120,7 +124,8 @@ async function createTower() {
         ...handlers,
         onReady: () => {
           hideBootLoader();
-          setTimeout(() => t.sweep(), 500);
+          t.playIntro();
+          if (!openDeepLink()) setTimeout(() => t.sweep(), 1800);
         },
       });
       app.insertBefore(t.stage, $('#tower-labels'));
@@ -409,6 +414,7 @@ function openFloor(floor, source) {
   state.floor = floor;
   state.unit = null;
   tower.selectFloor(floor);
+  tower.highlightUnit?.(null);
   if (!isDesktop()) closeSheet($('#filters'));
   const villa = units[0].type === 'B';
   const avail = units.filter((u) => u.status === 'available').length;
@@ -454,8 +460,19 @@ function openUnit(unitNo) {
   if (!u) return;
   state.unit = u;
   track('unit_open', { unit: u.unit, floor: u.floor, type: u.type, status: u.status });
+  if (state.floor !== u.floor) {
+    state.floor = u.floor;
+    tower.selectFloor(u.floor);
+  }
+  const onFacade = tower.highlightUnit ? tower.highlightUnit(u) : null;
   const villa = u.type === 'B';
   const showBalcony = state.balcony && !villa;
+  const facadeNote =
+    onFacade === null
+      ? ''
+      : `<p class="facade-note">${ICON.grid}${
+          onFacade ? 'Outlined in gold on the building' : `On the ${FACING[u.facing].toLowerCase()} side, behind the tower in this view`
+        }</p>`;
   $('#panel-body').innerHTML = `
     <button class="back-link" type="button" data-action="back">${ICON.back}${ordinal(u.floor)} floor</button>
     <div class="unit-hero">
@@ -466,9 +483,14 @@ function openUnit(unitNo) {
       </div>
       <div class="price">${inr(u.price)}<small>Agreement value</small></div>
     </div>
+    ${facadeNote}
     <div class="unit-actions">
       <button class="btn btn-gold btn-block" type="button" data-action="step-inside">${ICON.pano}Step inside</button>
       ${showBalcony ? `<button class="btn btn-ghost btn-block" type="button" data-action="balcony">${ICON.view}View from balcony</button>` : ''}
+      <div class="share-row">
+        <a class="btn btn-ghost" data-share="whatsapp" href="${esc(whatsappLink(u))}" target="_blank" rel="noopener">${ICON.share}WhatsApp</a>
+        <button class="btn btn-ghost" type="button" data-share="copy">${ICON.link}Copy link</button>
+      </div>
     </div>
     <div class="card">
       <h3>${villa ? '4 BHK duplex' : '3 BHK'} <span class="tag">Indicative plan</span></h3>
@@ -492,8 +514,92 @@ function openUnit(unitNo) {
       <a class="btn btn-gold btn-block cta-book" data-cta="unit_view" href="${esc(config.bookingUrl)}" target="_blank" rel="noopener">Book a full live demo</a>
     </div>`;
   $('#panel-body').querySelector('.cta-book').addEventListener('click', () => track('book_demo_click', { location: 'unit_view' }));
+  $('#panel-body').querySelector('[data-share="whatsapp"]').addEventListener('click', (e) => shareUnit(u, e));
+  $('#panel-body').querySelector('[data-share="copy"]').addEventListener('click', () => copyUnitLink(u));
   $('#panel-body').scrollTop = 0;
   openSheet($('#panel'));
+}
+
+/* ---------------- Share a unit ---------------- */
+
+function unitLink(u) {
+  const link = new URL(location.href);
+  link.search = '';
+  link.hash = '';
+  link.searchParams.set('unit', u.unit);
+  return link.href;
+}
+
+const shareText = (u) =>
+  `Unit ${u.unit}, ${u.bhk} BHK${u.duplex ? ' sky villa' : ''} at Tourlo Demo Residences, Mumbai. ${sqft(u.carpetArea)}, ${FACING[u.facing]} facing, ${inr(u.price)}. Take the tour:`;
+
+const whatsappLink = (u) => `https://wa.me/?text=${encodeURIComponent(`${shareText(u)} ${unitLink(u)}`)}`;
+
+// On phones the native share sheet (WhatsApp, Messages, etc.) is the better experience.
+function shareUnit(u, e) {
+  track('unit_share', { unit: u.unit, method: navigator.share ? 'native' : 'whatsapp' });
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    e.preventDefault();
+    navigator.share({ title: `Unit ${u.unit}, Tourlo Demo Residences`, text: shareText(u), url: unitLink(u) }).catch(() => {});
+  }
+}
+
+async function copyUnitLink(u) {
+  track('unit_share', { unit: u.unit, method: 'copy' });
+  try {
+    await navigator.clipboard.writeText(unitLink(u));
+    toast('Link copied');
+  } catch {
+    window.prompt('Copy this link', unitLink(u));
+  }
+}
+
+// ?unit=1402 opens straight into that home. Returns true when it handled a link.
+function openDeepLink() {
+  const no = new URLSearchParams(location.search).get('unit');
+  const u = no && state.inventory.units.find((x) => x.unit === no);
+  if (!u) return false;
+  $('.intro-card')?.remove();
+  track('unit_deeplink', { unit: u.unit });
+  openFloor(u.floor, 'link');
+  setTimeout(() => openUnit(u.unit), 350);
+  return true;
+}
+
+/* ---------------- Availability colours ---------------- */
+
+function setupAvailability() {
+  if (!tower.setAvailability) return;
+  const btn = document.createElement('button');
+  btn.className = 'pill-btn';
+  btn.id = 'btn-availability';
+  btn.type = 'button';
+  btn.setAttribute('aria-pressed', 'false');
+  btn.setAttribute('aria-label', 'Show availability on the building');
+  btn.innerHTML = `${ICON.grid}<span>Availability</span>`;
+  $('#btn-filters').after(btn);
+  const legend = document.createElement('div');
+  legend.className = 'av-legend';
+  legend.hidden = true;
+  legend.innerHTML = `<span class="s-available"><i></i>Homes available</span><span class="s-held"><i></i>Only on hold</span><span class="s-sold"><i></i>Sold out</span>`;
+  app.appendChild(legend);
+  btn.addEventListener('click', () => {
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', String(on));
+    legend.hidden = !on;
+    tower.setAvailability(on ? floorAvailability() : null);
+    track('availability_toggle', { on });
+  });
+}
+
+// A floor is green if any home is available, amber if the rest are only on hold, red if sold out.
+function floorAvailability() {
+  const m = new Map();
+  for (const [floor, units] of state.byFloor) {
+    const has = (st) => units.some((u) => u.status === st);
+    m.set(floor, has('available') ? 'available' : has('held') ? 'held' : 'sold');
+  }
+  return m;
 }
 
 /* ---------------- Filters ---------------- */
