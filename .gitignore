@@ -1,0 +1,6 @@
+node_modules/
+.next/
+out/
+.DS_Store
+# Third-party test panoramas: downloaded locally by `npm run fetch:panos`, never committed
+public/assets/panos/
