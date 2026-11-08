@@ -1,0 +1,496 @@
+{
+  "project": {
+    "name": "GHR Callisto (test assets)",
+    "subtitle": "Internal prototype, not for client use",
+    "contact": {
+      "phone": "+91 00000 00000",
+      "email": "sales@example.com",
+      "whatsapp": "910000000000"
+    },
+    "location": {
+      "address": "Kollur, Telangana (placeholder)",
+      "mapUrl": "https://maps.google.com/?q=Kollur+Telangana"
+    }
+  },
+  "categories": [
+    "Aerial",
+    "Ground",
+    "Balcony",
+    "Flat",
+    "Office"
+  ],
+  "startScene": "04_front-view-to-top",
+  "scenes": [
+    {
+      "id": "01_top-view",
+      "category": "Aerial",
+      "name": "Top View",
+      "panorama": "assets/panos/aerial/01_top-view.jpg"
+    },
+    {
+      "id": "02_top-view",
+      "category": "Aerial",
+      "name": "Top View",
+      "panorama": "assets/panos/aerial/02_top-view.jpg"
+    },
+    {
+      "id": "03_front-view-to-top",
+      "category": "Aerial",
+      "name": "Front View (to Top)",
+      "panorama": "assets/panos/aerial/03_front-view-to-top.jpg"
+    },
+    {
+      "id": "04_front-view-to-top",
+      "category": "Aerial",
+      "name": "Front View (to Top)",
+      "panorama": "assets/panos/aerial/04_front-view-to-top.jpg"
+    },
+    {
+      "id": "05_front-view-also-balcony",
+      "category": "Aerial",
+      "name": "Front View (also Balcony)",
+      "panorama": "assets/panos/aerial/05_front-view-also-balcony.jpg"
+    },
+    {
+      "id": "06_left-view",
+      "category": "Aerial",
+      "name": "Left View",
+      "panorama": "assets/panos/aerial/06_left-view.jpg"
+    },
+    {
+      "id": "07_left-view",
+      "category": "Aerial",
+      "name": "Left View",
+      "panorama": "assets/panos/aerial/07_left-view.jpg"
+    },
+    {
+      "id": "08_right-view",
+      "category": "Aerial",
+      "name": "Right View",
+      "panorama": "assets/panos/aerial/08_right-view.jpg"
+    },
+    {
+      "id": "09_right-view",
+      "category": "Aerial",
+      "name": "Right View",
+      "panorama": "assets/panos/aerial/09_right-view.jpg"
+    },
+    {
+      "id": "10_far-view-left",
+      "category": "Aerial",
+      "name": "Far View - Left",
+      "panorama": "assets/panos/aerial/10_far-view-left.jpg"
+    },
+    {
+      "id": "11_far-view-left",
+      "category": "Aerial",
+      "name": "Far View - Left",
+      "panorama": "assets/panos/aerial/11_far-view-left.jpg"
+    },
+    {
+      "id": "12_far-view-right",
+      "category": "Aerial",
+      "name": "Far View - Right",
+      "panorama": "assets/panos/aerial/12_far-view-right.jpg"
+    },
+    {
+      "id": "13_far-view-right",
+      "category": "Aerial",
+      "name": "Far View - Right",
+      "panorama": "assets/panos/aerial/13_far-view-right.jpg"
+    },
+    {
+      "id": "14_balcony-view-a-3",
+      "category": "Balcony",
+      "name": "Balcony View A-3",
+      "panorama": "assets/panos/balcony/14_balcony-view-a-3.jpg"
+    },
+    {
+      "id": "15_balcony-view-d-6",
+      "category": "Balcony",
+      "name": "Balcony View D-6",
+      "panorama": "assets/panos/balcony/15_balcony-view-d-6.jpg"
+    },
+    {
+      "id": "16_balcony-view-f-5",
+      "category": "Balcony",
+      "name": "Balcony View F-5",
+      "panorama": "assets/panos/balcony/16_balcony-view-f-5.jpg"
+    },
+    {
+      "id": "17_balcony-view-h-2",
+      "category": "Balcony",
+      "name": "Balcony View H-2",
+      "panorama": "assets/panos/balcony/17_balcony-view-h-2.jpg"
+    },
+    {
+      "id": "18_1st-floor-balcony",
+      "category": "Balcony",
+      "name": "1st Floor Balcony",
+      "panorama": "assets/panos/balcony/18_1st-floor-balcony.jpg"
+    },
+    {
+      "id": "19_1st-floor-balcony",
+      "category": "Balcony",
+      "name": "1st Floor Balcony",
+      "panorama": "assets/panos/balcony/19_1st-floor-balcony.jpg"
+    },
+    {
+      "id": "20_9th-floor-balcony",
+      "category": "Balcony",
+      "name": "9th Floor Balcony",
+      "panorama": "assets/panos/balcony/20_9th-floor-balcony.jpg"
+    },
+    {
+      "id": "21_16th-floor-balcony",
+      "category": "Balcony",
+      "name": "16th Floor Balcony",
+      "panorama": "assets/panos/balcony/21_16th-floor-balcony.jpg"
+    },
+    {
+      "id": "22_main-entry-gate",
+      "category": "Ground",
+      "name": "Main Entry Gate",
+      "panorama": "assets/panos/ground/22_main-entry-gate.jpg"
+    },
+    {
+      "id": "23_arrival-plaza-entrance",
+      "category": "Ground",
+      "name": "Arrival Plaza (Entrance)",
+      "panorama": "assets/panos/ground/23_arrival-plaza-entrance.jpg"
+    },
+    {
+      "id": "24_entrance-lounge",
+      "category": "Ground",
+      "name": "Entrance Lounge",
+      "panorama": "assets/panos/ground/24_entrance-lounge.jpg"
+    },
+    {
+      "id": "25_entrance-lounge-wing-c-d",
+      "category": "Ground",
+      "name": "Entrance Lounge (Wing C&D)",
+      "panorama": "assets/panos/ground/25_entrance-lounge-wing-c-d.jpg"
+    },
+    {
+      "id": "26_entrance-lounge-wing-k",
+      "category": "Ground",
+      "name": "Entrance Lounge (Wing-K)",
+      "panorama": "assets/panos/ground/26_entrance-lounge-wing-k.jpg"
+    },
+    {
+      "id": "27_courtyard-1",
+      "category": "Ground",
+      "name": "Courtyard-1",
+      "panorama": "assets/panos/ground/27_courtyard-1.jpg"
+    },
+    {
+      "id": "28_courtyard-2",
+      "category": "Ground",
+      "name": "Courtyard-2",
+      "panorama": "assets/panos/ground/28_courtyard-2.jpg"
+    },
+    {
+      "id": "29_central-courtyard",
+      "category": "Ground",
+      "name": "Central Courtyard",
+      "panorama": "assets/panos/ground/29_central-courtyard.jpg"
+    },
+    {
+      "id": "30_club-callisto-entrance",
+      "category": "Ground",
+      "name": "Club Callisto (Entrance)",
+      "panorama": "assets/panos/ground/30_club-callisto-entrance.jpg"
+    },
+    {
+      "id": "31_swimming-pool",
+      "category": "Ground",
+      "name": "Swimming Pool",
+      "panorama": "assets/panos/ground/31_swimming-pool.jpg"
+    },
+    {
+      "id": "32_amphitheatre",
+      "category": "Ground",
+      "name": "Amphitheatre",
+      "panorama": "assets/panos/ground/32_amphitheatre.jpg"
+    },
+    {
+      "id": "33_party-lawn",
+      "category": "Ground",
+      "name": "Party Lawn",
+      "panorama": "assets/panos/ground/33_party-lawn.jpg"
+    },
+    {
+      "id": "34_basketball-court",
+      "category": "Ground",
+      "name": "Basketball Court",
+      "panorama": "assets/panos/ground/34_basketball-court.jpg"
+    },
+    {
+      "id": "35_multipurpose-court",
+      "category": "Ground",
+      "name": "Multipurpose Court",
+      "panorama": "assets/panos/ground/35_multipurpose-court.jpg"
+    },
+    {
+      "id": "36_multipurpose-court",
+      "category": "Ground",
+      "name": "Multipurpose Court",
+      "panorama": "assets/panos/ground/36_multipurpose-court.jpg"
+    },
+    {
+      "id": "37_active-play-zone",
+      "category": "Ground",
+      "name": "Active Play Zone",
+      "panorama": "assets/panos/ground/37_active-play-zone.jpg"
+    },
+    {
+      "id": "38_passage-wing-f",
+      "category": "Ground",
+      "name": "Passage (Wing-F)",
+      "panorama": "assets/panos/ground/38_passage-wing-f.jpg"
+    },
+    {
+      "id": "39_drawing-room",
+      "category": "Flat",
+      "name": "Drawing Room",
+      "panorama": "assets/panos/flat/39_drawing-room.jpg"
+    },
+    {
+      "id": "40_drawing-room",
+      "category": "Flat",
+      "name": "Drawing Room",
+      "panorama": "assets/panos/flat/40_drawing-room.jpg"
+    },
+    {
+      "id": "41_dining-living",
+      "category": "Flat",
+      "name": "Dining / Living",
+      "panorama": "assets/panos/flat/41_dining-living.jpg"
+    },
+    {
+      "id": "42_dining-area",
+      "category": "Flat",
+      "name": "Dining Area",
+      "panorama": "assets/panos/flat/42_dining-area.jpg"
+    },
+    {
+      "id": "43_kitchen-area",
+      "category": "Flat",
+      "name": "Kitchen Area",
+      "panorama": "assets/panos/flat/43_kitchen-area.jpg"
+    },
+    {
+      "id": "44_kitchen-area",
+      "category": "Flat",
+      "name": "Kitchen Area",
+      "panorama": "assets/panos/flat/44_kitchen-area.jpg"
+    },
+    {
+      "id": "45_master-bedroom",
+      "category": "Flat",
+      "name": "Master Bedroom",
+      "panorama": "assets/panos/flat/45_master-bedroom.jpg"
+    },
+    {
+      "id": "46_master-bedroom",
+      "category": "Flat",
+      "name": "Master Bedroom",
+      "panorama": "assets/panos/flat/46_master-bedroom.jpg"
+    },
+    {
+      "id": "47_bedroom-1",
+      "category": "Flat",
+      "name": "Bedroom-1",
+      "panorama": "assets/panos/flat/47_bedroom-1.jpg"
+    },
+    {
+      "id": "48_bedroom-2",
+      "category": "Flat",
+      "name": "Bedroom-2",
+      "panorama": "assets/panos/flat/48_bedroom-2.jpg"
+    },
+    {
+      "id": "49_bedroom-2",
+      "category": "Flat",
+      "name": "Bedroom-2",
+      "panorama": "assets/panos/flat/49_bedroom-2.jpg"
+    },
+    {
+      "id": "50_dress",
+      "category": "Flat",
+      "name": "Dress",
+      "panorama": "assets/panos/flat/50_dress.jpg"
+    },
+    {
+      "id": "51_balcony",
+      "category": "Flat",
+      "name": "Balcony",
+      "panorama": "assets/panos/flat/51_balcony.jpg"
+    },
+    {
+      "id": "52_wide-balcony",
+      "category": "Flat",
+      "name": "Wide Balcony",
+      "panorama": "assets/panos/flat/52_wide-balcony.jpg"
+    },
+    {
+      "id": "53_wide-utility",
+      "category": "Flat",
+      "name": "Wide Utility",
+      "panorama": "assets/panos/flat/53_wide-utility.jpg"
+    },
+    {
+      "id": "54_wide-utility",
+      "category": "Flat",
+      "name": "Wide Utility",
+      "panorama": "assets/panos/flat/54_wide-utility.jpg"
+    },
+    {
+      "id": "55_toilet",
+      "category": "Flat",
+      "name": "Toilet",
+      "panorama": "assets/panos/flat/55_toilet.jpg"
+    },
+    {
+      "id": "56_toilet",
+      "category": "Flat",
+      "name": "Toilet",
+      "panorama": "assets/panos/flat/56_toilet.jpg"
+    },
+    {
+      "id": "57_toilet",
+      "category": "Flat",
+      "name": "Toilet",
+      "panorama": "assets/panos/flat/57_toilet.jpg"
+    },
+    {
+      "id": "58_toilet",
+      "category": "Flat",
+      "name": "Toilet",
+      "panorama": "assets/panos/flat/58_toilet.jpg"
+    },
+    {
+      "id": "59_entrance",
+      "category": "Flat",
+      "name": "Entrance",
+      "panorama": "assets/panos/flat/59_entrance.jpg"
+    },
+    {
+      "id": "60_2bhk-passage",
+      "category": "Flat",
+      "name": "2BHK Passage",
+      "panorama": "assets/panos/flat/60_2bhk-passage.jpg"
+    },
+    {
+      "id": "61_3bhk-passage",
+      "category": "Flat",
+      "name": "3BHK Passage",
+      "panorama": "assets/panos/flat/61_3bhk-passage.jpg"
+    },
+    {
+      "id": "62_passage-1st-floor",
+      "category": "Flat",
+      "name": "Passage (1st Floor)",
+      "panorama": "assets/panos/flat/62_passage-1st-floor.jpg"
+    },
+    {
+      "id": "63_passage-1st-floor",
+      "category": "Flat",
+      "name": "Passage (1st Floor)",
+      "panorama": "assets/panos/flat/63_passage-1st-floor.jpg"
+    },
+    {
+      "id": "64_passage-1st-floor",
+      "category": "Flat",
+      "name": "Passage (1st Floor)",
+      "panorama": "assets/panos/flat/64_passage-1st-floor.jpg"
+    },
+    {
+      "id": "65_reception-area",
+      "category": "Office",
+      "name": "Reception Area",
+      "panorama": "assets/panos/office/65_reception-area.jpg"
+    },
+    {
+      "id": "66_passage-reception",
+      "category": "Office",
+      "name": "Passage (Reception)",
+      "panorama": "assets/panos/office/66_passage-reception.jpg"
+    },
+    {
+      "id": "67_passage-area",
+      "category": "Office",
+      "name": "Passage Area",
+      "panorama": "assets/panos/office/67_passage-area.jpg"
+    },
+    {
+      "id": "68_ceo-cabin",
+      "category": "Office",
+      "name": "CEO Cabin",
+      "panorama": "assets/panos/office/68_ceo-cabin.jpg"
+    },
+    {
+      "id": "69_conference-room",
+      "category": "Office",
+      "name": "Conference Room",
+      "panorama": "assets/panos/office/69_conference-room.jpg"
+    },
+    {
+      "id": "70_discussion-cabins",
+      "category": "Office",
+      "name": "Discussion Cabins",
+      "panorama": "assets/panos/office/70_discussion-cabins.jpg"
+    }
+  ],
+  "statusPairs": [
+    {
+      "name": "Top View",
+      "a": "01_top-view",
+      "b": "02_top-view",
+      "current": null,
+      "future": null,
+      "verified": false
+    },
+    {
+      "name": "Front View (to Top)",
+      "a": "03_front-view-to-top",
+      "b": "04_front-view-to-top",
+      "current": "03_front-view-to-top",
+      "future": "04_front-view-to-top",
+      "verified": false,
+      "note": "Likely: 04 loads first in the live tour and shows the CGI towers"
+    },
+    {
+      "name": "Left View",
+      "a": "06_left-view",
+      "b": "07_left-view",
+      "current": null,
+      "future": null,
+      "verified": false
+    },
+    {
+      "name": "Right View",
+      "a": "08_right-view",
+      "b": "09_right-view",
+      "current": null,
+      "future": null,
+      "verified": false
+    },
+    {
+      "name": "Far View - Left",
+      "a": "10_far-view-left",
+      "b": "11_far-view-left",
+      "current": null,
+      "future": null,
+      "verified": false
+    },
+    {
+      "name": "Far View - Right",
+      "a": "12_far-view-right",
+      "b": "13_far-view-right",
+      "current": null,
+      "future": null,
+      "verified": false
+    }
+  ]
+}
