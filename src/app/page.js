@@ -1,3 +1,5 @@
+import Tour from '../components/Tour';
+
 export default function Page() {
-  return <div id="viewer" />;
+  return <Tour />;
 }
