@@ -20,12 +20,17 @@ function buildPairs(statusPairs = []) {
 export default function Tour() {
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
+  const autorotateRef = useRef(null);
+  const toastTimer = useRef(null);
 
   const [tour, setTour] = useState(null);
   const [currentId, setCurrentId] = useState(null);
   const [activeCat, setActiveCat] = useState(null);
   const [openCat, setOpenCat] = useState(null);
+  const [panel, setPanel] = useState(null);
+  const [toastMsg, setToastMsg] = useState(null);
   const [missing, setMissing] = useState(false);
+  const [rotating, setRotating] = useState(false);
 
   const scenesById = useMemo(
     () => Object.fromEntries((tour?.scenes ?? []).map((s) => [s.id, s])),
@@ -65,6 +70,7 @@ export default function Tour() {
       viewer.addEventListener('panorama-loaded', () => setMissing(false));
 
       viewerRef.current = viewer;
+      autorotateRef.current = viewer.getPlugin(AutorotatePlugin);
       setTour(data);
       setCurrentId(startId);
     })();
@@ -73,6 +79,7 @@ export default function Tour() {
       cancelled = true;
       viewer?.destroy();
       viewerRef.current = null;
+      autorotateRef.current = null;
     };
   }, []);
 
@@ -85,6 +92,8 @@ export default function Tour() {
     return () => document.removeEventListener('click', onClick);
   }, []);
 
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
   function goTo(id) {
     const scene = scenesById[id];
     if (!scene || !viewerRef.current) return;
@@ -92,6 +101,28 @@ export default function Tour() {
     viewerRef.current.setPanorama(`${BASE}${scene.panorama}`, { transition: 800, showLoader: false });
     history.replaceState(null, '', `#scene=${id}`);
     setActiveCat(scene.category);
+  }
+
+  function toast(msg) {
+    setToastMsg(msg);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMsg(null), 1800);
+  }
+
+  async function share() {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      toast('Link copied');
+    } catch {
+      toast(location.href);
+    }
+  }
+
+  function toggleRotate() {
+    const autorotate = autorotateRef.current;
+    if (!autorotate) return;
+    autorotate.toggle();
+    setRotating(autorotate.isEnabled());
   }
 
   const scene = scenesById[currentId];
@@ -140,9 +171,43 @@ export default function Tour() {
         ))}
       </nav>
 
+      <nav className="ui-bottom" aria-label="Project">
+        <button data-panel="contact" onClick={() => tour && setPanel('contact')}>Contact</button>
+        <button data-panel="location" onClick={() => tour && setPanel('location')}>Location</button>
+        <button id="share-btn" onClick={share}>Share</button>
+        <button id="rotate-btn" aria-pressed={String(rotating)} onClick={toggleRotate}>Auto-rotate</button>
+      </nav>
+
+      <aside className="panel" id="panel" hidden={!panel}>
+        <button className="panel-close" aria-label="Close" onClick={() => setPanel(null)}>×</button>
+        <div id="panel-body">{tour && panel && <PanelBody kind={panel} project={tour.project} />}</div>
+      </aside>
+
+      <div className="toast" id="toast" hidden={!toastMsg}>{toastMsg}</div>
       <div className="missing" id="missing" hidden={!missing}>
         Panorama files not found. Run <code>npm run fetch:panos</code> first.
       </div>
+    </>
+  );
+}
+
+function PanelBody({ kind, project }) {
+  const { contact, location: loc } = project;
+  if (kind === 'contact') {
+    return (
+      <>
+        <h2>Contact</h2>
+        <p><a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a></p>
+        <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+        <p><a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noopener">WhatsApp</a></p>
+      </>
+    );
+  }
+  return (
+    <>
+      <h2>Location</h2>
+      <p>{loc.address}</p>
+      <p><a href={loc.mapUrl} target="_blank" rel="noopener">Open in Google Maps</a></p>
     </>
   );
 }
