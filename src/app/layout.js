@@ -1,5 +1,6 @@
 import '@photo-sphere-viewer/core/index.css';
 import '@photo-sphere-viewer/markers-plugin/index.css';
+import '@photo-sphere-viewer/virtual-tour-plugin/index.css';
 import '../style.css';
 
 export const metadata = {

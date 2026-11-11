@@ -26,6 +26,17 @@ function panoramaFor(scene) {
   };
 }
 
+// tour.json scene -> Virtual Tour node. `links` are room-to-room arrows: { to, yaw, pitch }.
+function toNode(scene) {
+  return {
+    id: scene.id,
+    name: scene.name,
+    thumbnail: `${BASE}${scene.thumb}`,
+    panorama: panoramaFor(scene),
+    links: (scene.links ?? []).map((l) => ({ nodeId: l.to, position: { yaw: l.yaw, pitch: l.pitch ?? 0 } })),
+  };
+}
+
 // Current/Future pairs: map each scene id to its partner + its role.
 function buildPairs(statusPairs = []) {
   const pairOf = {};
@@ -41,6 +52,7 @@ function buildPairs(statusPairs = []) {
 export default function Tour() {
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
+  const virtualTourRef = useRef(null);
   const autorotateRef = useRef(null);
   const toastTimer = useRef(null);
 
@@ -66,12 +78,14 @@ export default function Tour() {
 
     (async () => {
       const data = await fetch(`${BASE}data/tour.json`).then((r) => r.json());
-      const [{ Viewer }, { CubemapTilesAdapter }, { MarkersPlugin }, { AutorotatePlugin }] = await Promise.all([
-        import('@photo-sphere-viewer/core'),
-        import('@photo-sphere-viewer/cubemap-tiles-adapter'),
-        import('@photo-sphere-viewer/markers-plugin'),
-        import('@photo-sphere-viewer/autorotate-plugin'),
-      ]);
+      const [{ Viewer }, { CubemapTilesAdapter }, { MarkersPlugin }, { AutorotatePlugin }, { VirtualTourPlugin }] =
+        await Promise.all([
+          import('@photo-sphere-viewer/core'),
+          import('@photo-sphere-viewer/cubemap-tiles-adapter'),
+          import('@photo-sphere-viewer/markers-plugin'),
+          import('@photo-sphere-viewer/autorotate-plugin'),
+          import('@photo-sphere-viewer/virtual-tour-plugin'),
+        ]);
       if (cancelled) return;
 
       const byId = Object.fromEntries(data.scenes.map((s) => [s.id, s]));
@@ -81,28 +95,55 @@ export default function Tour() {
       viewer = new Viewer({
         container: containerRef.current,
         adapter: CubemapTilesAdapter.withConfig({ showErrorTile: false }),
-        panorama: panoramaFor(byId[startId]),
         defaultZoomLvl: 0,
         navbar: ['zoom', 'fullscreen'],
         plugins: [
-          MarkersPlugin, // hotspots go here next (see CLAUDE.md roadmap)
+          MarkersPlugin,
           [AutorotatePlugin, { autostartDelay: null, autostartOnIdle: false, autorotateSpeed: '1rpm' }],
+          [VirtualTourPlugin, {
+            positionMode: 'manual',
+            renderMode: '3d',
+            nodes: data.scenes.map(toNode),
+            startNodeId: startId,
+            preload: true,
+            transitionOptions: { showLoader: false, speed: '20rpm', effect: 'fade', rotation: true },
+          }],
         ],
       });
       if (process.env.NODE_ENV !== 'production') window.psv = viewer; // handy in the console
       viewer.addEventListener('panorama-error', () => setMissing(true));
       viewer.addEventListener('panorama-loaded', () => setMissing(false));
 
+      const virtualTour = viewer.getPlugin(VirtualTourPlugin);
+      virtualTour.addEventListener('node-changed', ({ node }) => {
+        setCurrentId(node.id);
+        setActiveCat(byId[node.id]?.category ?? null);
+        history.replaceState(null, '', `#scene=${node.id}`);
+      });
+
+      // Dev helper: open with ?dev=1, click anywhere in the pano to log and copy a link stub.
+      if (new URLSearchParams(location.search).has('dev')) {
+        const deg = (rad) => `${Math.round((rad * 180) / Math.PI)}deg`;
+        viewer.addEventListener('click', ({ data: { yaw, pitch } }) => {
+          const signedYaw = yaw > Math.PI ? yaw - 2 * Math.PI : yaw;
+          const stub = `{ "to": "", "yaw": "${deg(signedYaw)}", "pitch": "${deg(pitch)}" }`;
+          console.log('[dev]', virtualTour.getCurrentNode()?.id, stub);
+          navigator.clipboard?.writeText(stub).catch(() => {});
+          toast(stub);
+        });
+      }
+
       viewerRef.current = viewer;
+      virtualTourRef.current = virtualTour;
       autorotateRef.current = viewer.getPlugin(AutorotatePlugin);
       setTour(data);
-      setCurrentId(startId);
     })();
 
     return () => {
       cancelled = true;
       viewer?.destroy();
       viewerRef.current = null;
+      virtualTourRef.current = null;
       autorotateRef.current = null;
     };
   }, []);
@@ -118,19 +159,16 @@ export default function Tour() {
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
 
+  // Menu and status toggle jumps; the node-changed listener updates title, menu and URL.
   function goTo(id) {
-    const scene = scenesById[id];
-    if (!scene || !viewerRef.current) return;
-    setCurrentId(id);
-    viewerRef.current.setPanorama(panoramaFor(scene), { transition: 800, showLoader: false });
-    history.replaceState(null, '', `#scene=${id}`);
-    setActiveCat(scene.category);
+    if (!scenesById[id] || !virtualTourRef.current) return;
+    virtualTourRef.current.setCurrentNode(id, { rotation: false });
   }
 
   function toast(msg) {
     setToastMsg(msg);
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastMsg(null), 1800);
+    toastTimer.current = setTimeout(() => setToastMsg(null), 2400);
   }
 
   async function share() {

@@ -60,4 +60,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; }
   .ui-bottom { bottom: 56px; }
   .ui-bottom button { padding: 8px 10px; }
   .panel { bottom: 172px; }
+  /* Lift the room arrows above the two menu rows. */
+  .psv-virtual-tour-arrows { margin-bottom: 150px !important; }
 }

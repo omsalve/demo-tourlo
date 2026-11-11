@@ -14,7 +14,7 @@ Full decode of the reference (every menu, hotspot, file, pipeline): see `docs/re
 - Next.js 16 (App Router, plain JS, React 19), static export (`output: 'export'`)
 - Photo Sphere Viewer 5.15.1 (`@photo-sphere-viewer/*`) on three.js 0.185.1
 - Panoramas load as tiled cubemaps (`cubemap-tiles-adapter`): a 512 px base, then 1024 and 2048 px tiles stream in as you look around
-- Plugins in use: markers, autorotate. Planned: virtual-tour, map (floorplan minimap), gallery
+- Plugins in use: virtual-tour (scene graph + room arrows), markers, autorotate. Planned: map (floorplan minimap), gallery
 - Static output (`npm run build` produces `out/`), deployable to Netlify / Vercel / S3
 - PSV touches the DOM, so the viewer lives in a client component and PSV is imported inside `useEffect`
 - Sub-path hosting: build with `NEXT_PUBLIC_BASE_PATH=/your-path`
@@ -35,7 +35,7 @@ npm run preview          # serve out/ on http://localhost:4173
 
 ```
 data/ghr_callisto_pano_links.csv   source list of 70 panoramas (direct URLs)
-scripts/fetch_panos.py             downloader (stdlib Python, retries, skips existing)
+scripts/fetch_panos.py             downloader (Python + Pillow, retries, resumes)
 public/data/tour.json              scene graph the viewer reads (edit this, not Tour.jsx, to add scenes)
 public/assets/panos/               downloaded panoramas (gitignored)
 src/app/layout.js                  root layout, page title, global CSS imports
@@ -52,9 +52,10 @@ docs/                              reference decode, notes
 - `categories`: top menu order
 - `scenes[]`: `{ id, category, name, thumb, tiles }`. `id` = `<nn>_<slug>`, matches the file name. `thumb` is the 724x362 menu image; `tiles` is the folder holding `<face>/<level>/<row>_<col>.jpg` (faces f b l r u d, levels 0/1/2 = 512/1024/2048 px)
 - `statusPairs[]`: Current vs Future pairs of the same drone view. `current` / `future` hold scene ids. `verified: false` means the roles are a guess: confirm by looking at both images (the "future" one has the CGI towers composited in) and set `verified: true`
+- `scene.links[]`: room-to-room arrows `{ to, yaw, pitch }`, angles as strings like `"30deg"` (yaw 0 = centre of the thumbnail, positive = right)
 - `startScene`: scene id loaded first
 
-Future fields to add, in this order: `scene.hotspots[]` (yaw, pitch, target or info), `scene.info` (room size label), `floorplans[]` with per-scene x/y, `units[]` for inventory.
+Future fields to add, in this order: `scene.info` (room size label), `floorplans[]` with per-scene x/y, `units[]` for inventory.
 
 ## Asset rules (important)
 
@@ -72,6 +73,10 @@ Future fields to add, in this order: `scene.hotspots[]` (yaw, pitch, target or i
 - Deep links: `#scene=<id>`
 - Mobile layout (menus move to the bottom)
 - "Run fetch:panos" message if files are missing
+- Sharp cube tiles (up to 2048 px per face) instead of 724 px thumbnails
+- Current / Future pairs verified
+- Room-to-room arrows in both sample flats (Virtual Tour plugin)
+- Dev helper: open with `?dev=1`, click in the pano to copy a `{ "to", "yaw", "pitch" }` link stub
 
 ## Roadmap (do these in order, one PR each)
 

@@ -6,7 +6,7 @@ Small-scale web 360 real estate tour, modelled on the GHR Callisto 3DVista tour.
 
 ```
 npm install
-npm run fetch:panos   # one-time: downloads 70 test panoramas as sharp cube tiles (needs Python 3.8+, about 300 MB, re-run to resume)
+npm run fetch:panos   # one-time: downloads 70 test panoramas as sharp cube tiles (needs Python 3.8+ and `pip install pillow`, about 300 MB, re-run to resume)
 npm run dev
 ```
 
@@ -26,7 +26,9 @@ Upload `out/` to any static host (Netlify, Vercel, S3). For a sub-path, build wi
 - Scene menu by category with thumbnails
 - Current / Future toggle on aerial views
 - Contact, Location, Share link, Auto-rotate
+- Room-to-room arrows inside the sample flats
 - Deep links (`#scene=40_drawing-room`)
+- Dev helper: add `?dev=1` to the URL, click in the pano to copy yaw/pitch for a new link in `public/data/tour.json`
 - Mobile layout
 
 ## Notes

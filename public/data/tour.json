@@ -292,21 +292,62 @@
       "category": "Flat",
       "name": "Drawing Room",
       "thumb": "assets/panos/flat/39_drawing-room.jpg",
-      "tiles": "assets/panos/flat/39_drawing-room"
+      "tiles": "assets/panos/flat/39_drawing-room",
+      "links": [
+        {
+          "to": "61_3bhk-passage",
+          "yaw": "33deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "41_dining-living",
+          "yaw": "-148deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "46_master-bedroom",
+          "yaw": "-55deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "40_drawing-room",
       "category": "Flat",
       "name": "Drawing Room",
       "thumb": "assets/panos/flat/40_drawing-room.jpg",
-      "tiles": "assets/panos/flat/40_drawing-room"
+      "tiles": "assets/panos/flat/40_drawing-room",
+      "links": [
+        {
+          "to": "60_2bhk-passage",
+          "yaw": "-58deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "41_dining-living",
       "category": "Flat",
       "name": "Dining / Living",
       "thumb": "assets/panos/flat/41_dining-living.jpg",
-      "tiles": "assets/panos/flat/41_dining-living"
+      "tiles": "assets/panos/flat/41_dining-living",
+      "links": [
+        {
+          "to": "39_drawing-room",
+          "yaw": "110deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "44_kitchen-area",
+          "yaw": "30deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "48_bedroom-2",
+          "yaw": "-120deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "42_dining-area",
@@ -327,7 +368,14 @@
       "category": "Flat",
       "name": "Kitchen Area",
       "thumb": "assets/panos/flat/44_kitchen-area.jpg",
-      "tiles": "assets/panos/flat/44_kitchen-area"
+      "tiles": "assets/panos/flat/44_kitchen-area",
+      "links": [
+        {
+          "to": "41_dining-living",
+          "yaw": "-23deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "45_master-bedroom",
@@ -341,21 +389,62 @@
       "category": "Flat",
       "name": "Master Bedroom",
       "thumb": "assets/panos/flat/46_master-bedroom.jpg",
-      "tiles": "assets/panos/flat/46_master-bedroom"
+      "tiles": "assets/panos/flat/46_master-bedroom",
+      "links": [
+        {
+          "to": "39_drawing-room",
+          "yaw": "65deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "50_dress",
+          "yaw": "103deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "51_balcony",
+          "yaw": "-150deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "47_bedroom-1",
       "category": "Flat",
       "name": "Bedroom-1",
       "thumb": "assets/panos/flat/47_bedroom-1.jpg",
-      "tiles": "assets/panos/flat/47_bedroom-1"
+      "tiles": "assets/panos/flat/47_bedroom-1",
+      "links": [
+        {
+          "to": "39_drawing-room",
+          "yaw": "-120deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "56_toilet",
+          "yaw": "132deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "48_bedroom-2",
       "category": "Flat",
       "name": "Bedroom-2",
       "thumb": "assets/panos/flat/48_bedroom-2.jpg",
-      "tiles": "assets/panos/flat/48_bedroom-2"
+      "tiles": "assets/panos/flat/48_bedroom-2",
+      "links": [
+        {
+          "to": "41_dining-living",
+          "yaw": "144deg",
+          "pitch": "0deg"
+        },
+        {
+          "to": "57_toilet",
+          "yaw": "-127deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "49_bedroom-2",
@@ -369,14 +458,28 @@
       "category": "Flat",
       "name": "Dress",
       "thumb": "assets/panos/flat/50_dress.jpg",
-      "tiles": "assets/panos/flat/50_dress"
+      "tiles": "assets/panos/flat/50_dress",
+      "links": [
+        {
+          "to": "46_master-bedroom",
+          "yaw": "-88deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "51_balcony",
       "category": "Flat",
       "name": "Balcony",
       "thumb": "assets/panos/flat/51_balcony.jpg",
-      "tiles": "assets/panos/flat/51_balcony"
+      "tiles": "assets/panos/flat/51_balcony",
+      "links": [
+        {
+          "to": "46_master-bedroom",
+          "yaw": "88deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "52_wide-balcony",
@@ -411,14 +514,28 @@
       "category": "Flat",
       "name": "Toilet",
       "thumb": "assets/panos/flat/56_toilet.jpg",
-      "tiles": "assets/panos/flat/56_toilet"
+      "tiles": "assets/panos/flat/56_toilet",
+      "links": [
+        {
+          "to": "47_bedroom-1",
+          "yaw": "-43deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "57_toilet",
       "category": "Flat",
       "name": "Toilet",
       "thumb": "assets/panos/flat/57_toilet.jpg",
-      "tiles": "assets/panos/flat/57_toilet"
+      "tiles": "assets/panos/flat/57_toilet",
+      "links": [
+        {
+          "to": "48_bedroom-2",
+          "yaw": "15deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "58_toilet",
@@ -439,14 +556,28 @@
       "category": "Flat",
       "name": "2BHK Passage",
       "thumb": "assets/panos/flat/60_2bhk-passage.jpg",
-      "tiles": "assets/panos/flat/60_2bhk-passage"
+      "tiles": "assets/panos/flat/60_2bhk-passage",
+      "links": [
+        {
+          "to": "40_drawing-room",
+          "yaw": "30deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "61_3bhk-passage",
       "category": "Flat",
       "name": "3BHK Passage",
       "thumb": "assets/panos/flat/61_3bhk-passage.jpg",
-      "tiles": "assets/panos/flat/61_3bhk-passage"
+      "tiles": "assets/panos/flat/61_3bhk-passage",
+      "links": [
+        {
+          "to": "39_drawing-room",
+          "yaw": "39deg",
+          "pitch": "0deg"
+        }
+      ]
     },
     {
       "id": "62_passage-1st-floor",
