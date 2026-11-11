@@ -517,9 +517,9 @@
       "name": "Top View",
       "a": "01_top-view",
       "b": "02_top-view",
-      "current": null,
-      "future": null,
-      "verified": false
+      "current": "01_top-view",
+      "future": "02_top-view",
+      "verified": true
     },
     {
       "name": "Front View (to Top)",
@@ -527,40 +527,39 @@
       "b": "04_front-view-to-top",
       "current": "03_front-view-to-top",
       "future": "04_front-view-to-top",
-      "verified": false,
-      "note": "Likely: 04 loads first in the live tour and shows the CGI towers"
+      "verified": true
     },
     {
       "name": "Left View",
       "a": "06_left-view",
       "b": "07_left-view",
-      "current": null,
-      "future": null,
-      "verified": false
+      "current": "06_left-view",
+      "future": "07_left-view",
+      "verified": true
     },
     {
       "name": "Right View",
       "a": "08_right-view",
       "b": "09_right-view",
-      "current": null,
-      "future": null,
-      "verified": false
+      "current": "08_right-view",
+      "future": "09_right-view",
+      "verified": true
     },
     {
       "name": "Far View - Left",
       "a": "10_far-view-left",
       "b": "11_far-view-left",
-      "current": null,
-      "future": null,
-      "verified": false
+      "current": "10_far-view-left",
+      "future": "11_far-view-left",
+      "verified": true
     },
     {
       "name": "Far View - Right",
       "a": "12_far-view-right",
       "b": "13_far-view-right",
-      "current": null,
-      "future": null,
-      "verified": false
+      "current": "13_far-view-right",
+      "future": "12_far-view-right",
+      "verified": true
     }
   ]
 }
