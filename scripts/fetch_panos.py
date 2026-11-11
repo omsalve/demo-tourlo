@@ -16,7 +16,7 @@ The source tour (3DVista) stores each cube face as 512 px tiles at several
 zoom levels. We keep the three power-of-two levels, which is what the Photo
 Sphere Viewer cubemap tiles adapter expects. Re-running skips files that exist.
 
-No installs needed: Python 3.8+ standard library only.
+Needs Python 3.8+ and Pillow (pip install pillow) for scenes whose tiles get resampled.
 Assets are GHR Infra / 360EYE copyright: internal testing only, keep the repo private.
 """
 import csv, json, re, sys, time, urllib.request
