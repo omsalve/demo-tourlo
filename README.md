@@ -6,7 +6,7 @@ Small-scale web 360 real estate tour, modelled on the GHR Callisto 3DVista tour.
 
 ```
 npm install
-npm run fetch:panos   # one-time: downloads 70 test panoramas (needs Python 3.8+)
+npm run fetch:panos   # one-time: downloads 70 test panoramas as sharp cube tiles (needs Python 3.8+, about 300 MB, re-run to resume)
 npm run dev
 ```
 
@@ -19,7 +19,7 @@ npm run build     # static site in out/
 npm run preview   # check it on http://localhost:4173
 ```
 
-Upload `out/` to any static host (Netlify, Vercel, S3). For a sub-path, build with `NEXT_PUBLIC_BASE_PATH=/your-path`. Remove `out/assets/panos/` first if the deploy is public (see Notes). Add `--cube` mode with `npm run fetch:panos:cube` if you also want the 512px cube faces.
+Upload `out/` to any static host (Netlify, Vercel, S3). For a sub-path, build with `NEXT_PUBLIC_BASE_PATH=/your-path`. Remove `out/assets/panos/` first if the deploy is public (see Notes).
 
 ## What works
 

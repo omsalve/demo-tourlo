@@ -13,6 +13,7 @@ Full decode of the reference (every menu, hotspot, file, pipeline): see `docs/re
 
 - Next.js 16 (App Router, plain JS, React 19), static export (`output: 'export'`)
 - Photo Sphere Viewer 5.15.1 (`@photo-sphere-viewer/*`) on three.js 0.185.1
+- Panoramas load as tiled cubemaps (`cubemap-tiles-adapter`): a 512 px base, then 1024 and 2048 px tiles stream in as you look around
 - Plugins in use: markers, autorotate. Planned: virtual-tour, map (floorplan minimap), gallery
 - Static output (`npm run build` produces `out/`), deployable to Netlify / Vercel / S3
 - PSV touches the DOM, so the viewer lives in a client component and PSV is imported inside `useEffect`
@@ -24,7 +25,7 @@ Keep all PSV packages on the same exact version. Check `three` matches PSV's dep
 
 ```
 npm install
-npm run fetch:panos      # downloads 70 test panoramas (724x362) into public/assets/panos/
+npm run fetch:panos      # downloads 70 test panoramas (thumbnail + cube tiles up to 2048 px/face, about 300 MB)
 npm run dev              # local dev server (http://localhost:3000)
 npm run build            # static production build into out/
 npm run preview          # serve out/ on http://localhost:4173
@@ -49,7 +50,7 @@ docs/                              reference decode, notes
 
 - `project`: name, contact, location (placeholders now)
 - `categories`: top menu order
-- `scenes[]`: `{ id, category, name, panorama }`. `id` = `<nn>_<slug>`, matches the file name
+- `scenes[]`: `{ id, category, name, thumb, tiles }`. `id` = `<nn>_<slug>`, matches the file name. `thumb` is the 724x362 menu image; `tiles` is the folder holding `<face>/<level>/<row>_<col>.jpg` (faces f b l r u d, levels 0/1/2 = 512/1024/2048 px)
 - `statusPairs[]`: Current vs Future pairs of the same drone view. `current` / `future` hold scene ids. `verified: false` means the roles are a guess: confirm by looking at both images (the "future" one has the CGI towers composited in) and set `verified: true`
 - `startScene`: scene id loaded first
 
