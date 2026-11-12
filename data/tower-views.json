@@ -1,8 +1,8 @@
 {
-  "_help": "Each view is one photo angle (add more views to enable the rotate arrows) with a dusk and a day image of identical framing. faces lists the visible facades as four corners in image pixels: tl and tr are the top of the 24th floor, bl and br the bottom of the 1st floor (top of the lobby). Floors are split evenly between them. Open the site with ?dev=1 and click the photo to log pixel coordinates. Each face also has a compass \"side\" (N, E, S or W) used to highlight a home on the building.",
-  "floors": 24,
-  "width": 1672,
-  "height": 941,
+  "_help": "One photo with a dusk and a day image of identical framing. Each face lists the slab lines between floors, measured on the photo: levels[0] is the top of the lobby, the last entry is the roof slab, and each entry gives the line's y at the face's left edge (x0) and right edge (x1), in image pixels. A building with N floors has N + 1 levels. side is the compass side the face looks onto, used to outline a home on the building. Open the site with ?dev=1 and click the photo to log pixel coordinates.",
+  "floors": 19,
+  "width": 3840,
+  "height": 2160,
   "views": [
     {
       "id": "main",
@@ -10,42 +10,178 @@
       "day": "assets/landing/hero_day.jpg",
       "faces": [
         {
-          "tl": [
-            671,
-            212
-          ],
-          "tr": [
-            838,
-            103
-          ],
-          "br": [
-            838,
-            715
-          ],
-          "bl": [
-            671,
-            721
-          ],
-          "side": "S"
+          "side": "S",
+          "x0": 1541,
+          "x1": 1920,
+          "levels": [
+            [
+              1657.0,
+              1629.0
+            ],
+            [
+              1593.5,
+              1552.8
+            ],
+            [
+              1531.9,
+              1480.0
+            ],
+            [
+              1470.3,
+              1407.2
+            ],
+            [
+              1408.7,
+              1335.7
+            ],
+            [
+              1347.1,
+              1262.9
+            ],
+            [
+              1286.5,
+              1192.4
+            ],
+            [
+              1225.9,
+              1120.6
+            ],
+            [
+              1165.3,
+              1048.8
+            ],
+            [
+              1104.7,
+              977.0
+            ],
+            [
+              1044.1,
+              905.2
+            ],
+            [
+              983.6,
+              832.0
+            ],
+            [
+              924.1,
+              759.8
+            ],
+            [
+              864.5,
+              689.0
+            ],
+            [
+              805.9,
+              617.9
+            ],
+            [
+              746.4,
+              547.0
+            ],
+            [
+              688.9,
+              475.5
+            ],
+            [
+              630.3,
+              405.7
+            ],
+            [
+              572.8,
+              334.2
+            ],
+            [
+              492.4,
+              238.3
+            ]
+          ]
         },
         {
-          "tl": [
-            838,
-            103
-          ],
-          "tr": [
-            997,
-            216
-          ],
-          "br": [
-            997,
-            723
-          ],
-          "bl": [
-            838,
-            715
-          ],
-          "side": "E"
+          "side": "E",
+          "x0": 1920,
+          "x1": 2290,
+          "levels": [
+            [
+              1623.5,
+              1657.8
+            ],
+            [
+              1551.0,
+              1593.4
+            ],
+            [
+              1477.9,
+              1531.3
+            ],
+            [
+              1405.8,
+              1470.2
+            ],
+            [
+              1332.5,
+              1409.2
+            ],
+            [
+              1260.1,
+              1349.2
+            ],
+            [
+              1188.8,
+              1290.2
+            ],
+            [
+              1116.7,
+              1229.1
+            ],
+            [
+              1043.9,
+              1171.3
+            ],
+            [
+              971.3,
+              1112.4
+            ],
+            [
+              900.0,
+              1053.4
+            ],
+            [
+              827.4,
+              994.6
+            ],
+            [
+              757.0,
+              936.6
+            ],
+            [
+              685.4,
+              878.7
+            ],
+            [
+              615.1,
+              820.7
+            ],
+            [
+              544.8,
+              762.7
+            ],
+            [
+              475.7,
+              704.6
+            ],
+            [
+              405.1,
+              647.7
+            ],
+            [
+              333.5,
+              589.8
+            ],
+            [
+              238.2,
+              501.3
+            ]
+          ]
         }
       ]
     }

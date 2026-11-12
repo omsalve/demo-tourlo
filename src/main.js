@@ -5,6 +5,7 @@ import { inr, sqft, FACING, STATUS, ordinal, esc } from './format.js';
 import { planFor, floorplate } from './plans.js';
 import { costSheetHTML } from './cost.js';
 import { LeadGate } from './lead.js';
+import { VoiceAssistant } from './voice.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -70,6 +71,7 @@ async function boot() {
     if (!state.byFloor.has(u.floor)) state.byFloor.set(u.floor, []);
     state.byFloor.get(u.floor).push(u);
   }
+  state.topFloor = Math.max(...state.byFloor.keys());
   const prices = inventory.units.map((u) => u.price);
   const step = 2500000;
   state.priceBounds = [Math.floor(Math.min(...prices) / step) * step, Math.ceil(Math.max(...prices) / step) * step];
@@ -84,6 +86,7 @@ async function boot() {
     return;
   }
   setupSiteNav();
+  setupVoice();
   setupIntro();
   setupDayNight();
   setupPanel();
@@ -248,7 +251,7 @@ function setupIntro() {
   el.className = 'intro-card';
   el.innerHTML = `
     <span class="eyebrow">Tourlo Demo Residences, Mumbai</span>
-    <h1>24 storeys of light, greenery and city views</h1>
+    <h1>19 storeys of light, greenery and city views</h1>
     <p>3 BHK residences and 4 BHK sky villas beside the metro. Tap any floor to see live availability, or walk the site in 360.</p>
     <div class="intro-actions">
       <button class="btn btn-gold" type="button" data-intro="explore">Explore the tower</button>
@@ -347,7 +350,7 @@ function setupPanel() {
     if (!t) return;
     const a = t.dataset.action;
     if (a === 'close') closeSheet(panel);
-    if (a === 'floor-up') guarded(() => openFloor(Math.min(24, state.floor + 1), 'stepper'));
+    if (a === 'floor-up') guarded(() => openFloor(Math.min(state.topFloor, state.floor + 1), 'stepper'));
     if (a === 'floor-down') guarded(() => openFloor(Math.max(1, state.floor - 1), 'stepper'));
     if (a === 'unit') guarded(() => openUnit(t.dataset.unit));
     if (a === 'back') openFloor(state.floor);
@@ -428,7 +431,7 @@ function openFloor(floor, source) {
       </div>
       <div class="head-actions">
         <button class="icon-btn" type="button" data-action="floor-down" aria-label="Floor below" ${floor <= 1 ? 'disabled' : ''}>${ICON.down}</button>
-        <button class="icon-btn" type="button" data-action="floor-up" aria-label="Floor above" ${floor >= 24 ? 'disabled' : ''}>${ICON.up}</button>
+        <button class="icon-btn" type="button" data-action="floor-up" aria-label="Floor above" ${floor >= state.topFloor ? 'disabled' : ''}>${ICON.up}</button>
         <button class="icon-btn" type="button" data-action="close" aria-label="Close panel">${ICON.close}</button>
       </div>
     </div>
@@ -581,7 +584,7 @@ function setupAvailability() {
   const legend = document.createElement('div');
   legend.className = 'av-legend';
   legend.hidden = true;
-  legend.innerHTML = `<span class="s-available"><i></i>Homes available</span><span class="s-held"><i></i>Only on hold</span><span class="s-sold"><i></i>Sold out</span>`;
+  legend.innerHTML = `<span class="s-available"><i></i>Plenty available</span><span class="s-held"><i></i>Few left</span><span class="s-sold"><i></i>Sold out</span>`;
   app.appendChild(legend);
   btn.addEventListener('click', () => {
     const on = btn.getAttribute('aria-pressed') !== 'true';
@@ -592,12 +595,14 @@ function setupAvailability() {
   });
 }
 
-// A floor is green if any home is available, amber if the rest are only on hold, red if sold out.
+// Green when at least half the homes on a floor are available, amber when only a few
+// (or only held ones) are left, red when every home is sold.
 function floorAvailability() {
   const m = new Map();
   for (const [floor, units] of state.byFloor) {
-    const has = (st) => units.some((u) => u.status === st);
-    m.set(floor, has('available') ? 'available' : has('held') ? 'held' : 'sold');
+    const avail = units.filter((u) => u.status === 'available').length;
+    const sold = units.filter((u) => u.status === 'sold').length;
+    m.set(floor, avail / units.length >= 0.5 ? 'available' : sold === units.length ? 'sold' : 'held');
   }
   return m;
 }
@@ -776,7 +781,8 @@ async function ensureViewer() {
     },
     onClose: () => {
       tower.setActive(true);
-      if (session.get('tourlo_final_shown') !== '1') {
+      if (state.quietClose) state.quietClose = false;
+      else if (session.get('tourlo_final_shown') !== '1') {
         session.set('tourlo_final_shown', '1');
         $('#final-modal').hidden = false;
       }
@@ -802,6 +808,106 @@ async function openTour(tourId, roomId) {
     v.start(tour, startRoom);
   };
   if (lead.guard(go)) go();
+}
+
+/* ---------------- Voice guide ---------------- */
+
+function setupVoice() {
+  const assistant = new VoiceAssistant({ onCommand: runVoiceCommand, track });
+  $('#btn-daynight').before(assistant.button());
+  $('#btn-viewer-close').before(assistant.button('on-dark'));
+}
+
+// Leaves the 360 view without the "book a demo" card, for commands that go elsewhere.
+function leaveViewer() {
+  if (viewer?.open) {
+    state.quietClose = true;
+    viewer.close();
+  }
+}
+
+const ROOM_NAMES = {
+  ext_rooftop: 'the rooftop terrace',
+  ext_lobby: 'the lobby',
+  ext_podium: 'the podium garden',
+  ext_aerial: 'the aerial view',
+  ext_station: 'the metro station',
+  ext_plaza: 'the arrival plaza',
+  typeA_living: 'the 3 BHK living room',
+  typeA_study: 'the 3 BHK study',
+  typeA_living_dining: 'the 3 BHK living and dining',
+  typeB_living: 'the sky villa',
+  typeB_lounge: 'the sky villa lounge',
+  typeB_stair_dining: 'the sky villa dining',
+};
+
+// Runs a parsed voice command. Returns the spoken reply, or false if it cannot be done here.
+function runVoiceCommand(cmd) {
+  switch (cmd.type) {
+    case 'room':
+      if (!state.tours?.[cmd.tour]) return false;
+      openTour(cmd.tour, cmd.room);
+      return `Taking you to ${ROOM_NAMES[cmd.room] || 'that view'}.`;
+    case 'floor': {
+      const f = cmd.floor === 'top' ? state.topFloor : cmd.floor;
+      if (!state.byFloor.has(f)) {
+        toast(`Floors go from 1 to ${state.topFloor}`);
+        return false;
+      }
+      leaveViewer();
+      guarded(() => openFloor(f, 'voice'));
+      const units = state.byFloor.get(f);
+      const avail = units.filter((u) => u.status === 'available').length;
+      return `Floor ${f}. ${avail} of ${units.length} homes available.`;
+    }
+    case 'unit': {
+      const u = state.inventory.units.find((x) => x.unit === cmd.unit);
+      if (!u) {
+        toast(`Unit ${cmd.unit} is not in this tower`);
+        return false;
+      }
+      leaveViewer();
+      guarded(() => {
+        openFloor(u.floor, 'voice');
+        openUnit(u.unit);
+      });
+      return `Unit ${u.unit}, ${STATUS[u.status].toLowerCase()}.`;
+    }
+    case 'availability': {
+      leaveViewer();
+      const btn = $('#btn-availability');
+      if (btn && btn.getAttribute('aria-pressed') !== 'true') btn.click();
+      return 'Green floors still have plenty of homes.';
+    }
+    case 'filter': {
+      leaveViewer();
+      state.filters = { bhk: cmd.bhk, status: new Set(['available']), facing: new Set(), price: null };
+      applyFilters();
+      track('filter_used', { filter: 'voice', value: `${cmd.bhk}bhk_available` });
+      const n = countMatches();
+      toast(`${n.units} available ${cmd.bhk} BHK homes on ${n.floors} floors`);
+      return `${n.units} ${cmd.bhk} BHK homes are available. Matching floors are glowing.`;
+    }
+    case 'night':
+      setNight(cmd.on);
+      return cmd.on ? 'Night view.' : 'Day view.';
+    case 'balcony':
+      if (!state.balcony) return false;
+      openLightbox();
+      return 'Here is the view from the balcony.';
+    case 'book':
+      leaveViewer();
+      $('#final-modal').hidden = false;
+      return 'Here is how to book a full live demo.';
+    case 'home':
+      leaveViewer();
+      closeLightbox();
+      closeSheet($('#panel'));
+      closeSheet($('#filters'));
+      return 'Back to the tower.';
+    default:
+      return false;
+  }
 }
 
 /* ---------------- Balcony lightbox ---------------- */

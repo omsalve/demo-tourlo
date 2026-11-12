@@ -2,7 +2,7 @@
   "project": "Tourlo Demo Residences",
   "city": "Mumbai",
   "currency": "INR",
-  "updated": "2026-10-28",
+  "updated": "2026-11-12",
   "pricing": {
     "note": "All prices are indicative and for demo purposes only.",
     "floorRisePerSqftPerFloor": 60,
@@ -26,7 +26,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "sold",
+      "status": "available",
       "price": 29033000
     },
     {
@@ -38,7 +38,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "sold",
+      "status": "available",
       "price": 30730000
     },
     {
@@ -50,7 +50,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "available",
+      "status": "sold",
       "price": 29033000
     },
     {
@@ -86,7 +86,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "sold",
+      "status": "available",
       "price": 30804400
     },
     {
@@ -110,7 +110,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "available",
       "price": 30704400
     },
     {
@@ -122,7 +122,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "held",
+      "status": "sold",
       "price": 29175200
     },
     {
@@ -134,7 +134,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "available",
+      "status": "sold",
       "price": 30878800
     },
     {
@@ -158,7 +158,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "held",
+      "status": "sold",
       "price": 30778800
     },
     {
@@ -170,7 +170,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "sold",
+      "status": "available",
       "price": 29246300
     },
     {
@@ -194,7 +194,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "held",
+      "status": "available",
       "price": 29246300
     },
     {
@@ -206,7 +206,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "held",
       "price": 30853200
     },
     {
@@ -230,7 +230,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "available",
+      "status": "held",
       "price": 31027600
     },
     {
@@ -254,7 +254,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "available",
       "price": 30927600
     },
     {
@@ -278,7 +278,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "available",
+      "status": "held",
       "price": 31102000
     },
     {
@@ -290,7 +290,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "sold",
+      "status": "available",
       "price": 29388500
     },
     {
@@ -338,7 +338,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "available",
+      "status": "held",
       "price": 29459600
     },
     {
@@ -350,7 +350,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "available",
+      "status": "sold",
       "price": 31076400
     },
     {
@@ -362,7 +362,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "held",
+      "status": "available",
       "price": 29530700
     },
     {
@@ -386,7 +386,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "sold",
+      "status": "available",
       "price": 29530700
     },
     {
@@ -410,7 +410,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "held",
+      "status": "available",
       "price": 29601800
     },
     {
@@ -434,7 +434,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "held",
+      "status": "sold",
       "price": 29601800
     },
     {
@@ -446,7 +446,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "available",
       "price": 31225200
     },
     {
@@ -458,7 +458,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "held",
+      "status": "available",
       "price": 29672900
     },
     {
@@ -494,7 +494,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "held",
       "price": 31299600
     },
     {
@@ -518,7 +518,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "held",
+      "status": "sold",
       "price": 31474000
     },
     {
@@ -542,7 +542,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "held",
       "price": 31374000
     },
     {
@@ -578,7 +578,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "sold",
+      "status": "held",
       "price": 29815100
     },
     {
@@ -590,7 +590,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "held",
       "price": 31448400
     },
     {
@@ -614,7 +614,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "held",
+      "status": "available",
       "price": 31622800
     },
     {
@@ -638,7 +638,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "sold",
+      "status": "available",
       "price": 31522800
     },
     {
@@ -650,7 +650,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "N",
-      "status": "available",
+      "status": "sold",
       "price": 29957300
     },
     {
@@ -662,7 +662,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "available",
+      "status": "sold",
       "price": 31697200
     },
     {
@@ -674,7 +674,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "available",
+      "status": "sold",
       "price": 29957300
     },
     {
@@ -722,7 +722,7 @@
       "duplex": false,
       "carpetArea": 1185,
       "facing": "S",
-      "status": "available",
+      "status": "sold",
       "price": 30028400
     },
     {
@@ -734,7 +734,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "available",
+      "status": "held",
       "price": 31671600
     },
     {
@@ -758,7 +758,7 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "E",
-      "status": "available",
+      "status": "sold",
       "price": 31846000
     },
     {
@@ -782,216 +782,72 @@
       "duplex": false,
       "carpetArea": 1240,
       "facing": "W",
-      "status": "held",
+      "status": "available",
       "price": 31746000
     },
     {
       "unit": "1701",
       "floor": 17,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "N",
-      "status": "sold",
-      "price": 30170600
+      "type": "B",
+      "typeName": "Type B Sky Villa",
+      "bhk": 4,
+      "duplex": true,
+      "carpetArea": 2960,
+      "facing": "E",
+      "status": "available",
+      "price": 94951600
     },
     {
       "unit": "1702",
       "floor": 17,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
-      "facing": "E",
-      "status": "available",
-      "price": 31920400
-    },
-    {
-      "unit": "1703",
-      "floor": 17,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "S",
-      "status": "available",
-      "price": 30170600
-    },
-    {
-      "unit": "1704",
-      "floor": 17,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
+      "type": "B",
+      "typeName": "Type B Sky Villa",
+      "bhk": 4,
+      "duplex": true,
+      "carpetArea": 3085,
       "facing": "W",
       "status": "available",
-      "price": 31820400
+      "price": 98846600
     },
     {
       "unit": "1801",
       "floor": 18,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "N",
+      "type": "B",
+      "typeName": "Type B Sky Villa",
+      "bhk": 4,
+      "duplex": true,
+      "carpetArea": 2960,
+      "facing": "E",
       "status": "available",
-      "price": 30241700
+      "price": 95129200
     },
     {
       "unit": "1802",
       "floor": 18,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
-      "facing": "E",
-      "status": "available",
-      "price": 31994800
-    },
-    {
-      "unit": "1803",
-      "floor": 18,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "S",
-      "status": "available",
-      "price": 30241700
-    },
-    {
-      "unit": "1804",
-      "floor": 18,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
+      "type": "B",
+      "typeName": "Type B Sky Villa",
+      "bhk": 4,
+      "duplex": true,
+      "carpetArea": 3085,
       "facing": "W",
-      "status": "available",
-      "price": 31894800
+      "status": "held",
+      "price": 99031700
     },
     {
       "unit": "1901",
       "floor": 19,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "N",
+      "type": "B",
+      "typeName": "Type B Sky Villa",
+      "bhk": 4,
+      "duplex": true,
+      "carpetArea": 2960,
+      "facing": "E",
       "status": "held",
-      "price": 30312800
+      "price": 95306800
     },
     {
       "unit": "1902",
       "floor": 19,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
-      "facing": "E",
-      "status": "available",
-      "price": 32069200
-    },
-    {
-      "unit": "1903",
-      "floor": 19,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "S",
-      "status": "available",
-      "price": 30312800
-    },
-    {
-      "unit": "1904",
-      "floor": 19,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
-      "facing": "W",
-      "status": "available",
-      "price": 31969200
-    },
-    {
-      "unit": "2001",
-      "floor": 20,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "N",
-      "status": "held",
-      "price": 30383900
-    },
-    {
-      "unit": "2002",
-      "floor": 20,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
-      "facing": "E",
-      "status": "available",
-      "price": 32143600
-    },
-    {
-      "unit": "2003",
-      "floor": 20,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1185,
-      "facing": "S",
-      "status": "available",
-      "price": 30383900
-    },
-    {
-      "unit": "2004",
-      "floor": 20,
-      "type": "A",
-      "typeName": "Type A Residence",
-      "bhk": 3,
-      "duplex": false,
-      "carpetArea": 1240,
-      "facing": "W",
-      "status": "available",
-      "price": 32043600
-    },
-    {
-      "unit": "2101",
-      "floor": 21,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 2960,
-      "facing": "E",
-      "status": "available",
-      "price": 95662000
-    },
-    {
-      "unit": "2102",
-      "floor": 21,
       "type": "B",
       "typeName": "Type B Sky Villa",
       "bhk": 4,
@@ -999,79 +855,7 @@
       "carpetArea": 3085,
       "facing": "W",
       "status": "available",
-      "price": 99587000
-    },
-    {
-      "unit": "2201",
-      "floor": 22,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 2960,
-      "facing": "E",
-      "status": "sold",
-      "price": 95839600
-    },
-    {
-      "unit": "2202",
-      "floor": 22,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 3085,
-      "facing": "W",
-      "status": "available",
-      "price": 99772100
-    },
-    {
-      "unit": "2301",
-      "floor": 23,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 2960,
-      "facing": "E",
-      "status": "available",
-      "price": 96017200
-    },
-    {
-      "unit": "2302",
-      "floor": 23,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 3085,
-      "facing": "W",
-      "status": "available",
-      "price": 99957200
-    },
-    {
-      "unit": "2401",
-      "floor": 24,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 2960,
-      "facing": "E",
-      "status": "held",
-      "price": 96194800
-    },
-    {
-      "unit": "2402",
-      "floor": 24,
-      "type": "B",
-      "typeName": "Type B Sky Villa",
-      "bhk": 4,
-      "duplex": true,
-      "carpetArea": 3085,
-      "facing": "W",
-      "status": "available",
-      "price": 100142300
+      "price": 99216800
     }
   ]
 }

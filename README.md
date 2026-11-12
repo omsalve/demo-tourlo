@@ -2,12 +2,13 @@
 
 An interactive sales gallery demo for **Tourlo Demo Residences** (fictional, Mumbai), built to embed on tourlo.in.
 
-- Photoreal tower explorer: one rendered hero with day and dusk versions, and an SVG floor overlay so every one of the 24 floors is tappable on the photo
+- Photoreal tower explorer: one rendered hero with day and dusk versions, and an SVG floor overlay so every one of the 19 floors is tappable on the photo, drawn on the measured slab lines
 - "Walk the site" 360 tour of the plaza, lobby, podium garden, rooftop, aerial view and metro station, linked into the apartment interiors
 - "Availability" toggle colours every floor on the photo (green available, amber only on hold, red sold out)
 - Tapping a floor zooms the photo in on it; opening a home outlines it on the facade
 - Share a home on WhatsApp or copy its link; `?unit=1402` opens straight into that home
 - A slow cinematic push in when the landing opens
+- Voice guide: tap the mic and say "take me to the rooftop", "go to floor 12", "show available 3 BHK" or "night view" (typed commands work in every browser)
 - A Three.js massing model of the tower as a fallback (`?view=3d`)
 - Live inventory from `data/inventory.json` with filters (BHK, status, price, facing). Matching floors glow on the tower
 - Unit view with an indicative SVG plan, specs, and an indicative cost sheet
@@ -55,12 +56,20 @@ npm run preview
 <iframe
   src="https://YOUR-DEPLOYMENT.vercel.app/"
   style="width:100%;height:100vh;border:0"
-  allow="gyroscope; accelerometer; fullscreen"
+  allow="gyroscope; accelerometer; microphone; fullscreen"
   loading="lazy"
   title="Tourlo interactive demo"></iframe>
 ```
 
-The `allow` attribute is needed for the gyroscope to work inside the iframe.
+The `allow` attribute is needed for the gyroscope and the voice guide's microphone to work inside the iframe.
+
+### Vercel toolbar
+
+Vercel adds its feedback toolbar to preview links only (not to the production domain). To hide it on previews too: Project Settings, General, Vercel Toolbar, set Preview to off (check the team setting as well), or add the environment variable `VERCEL_PREVIEW_FEEDBACK_ENABLED` = `0` for Preview and redeploy.
+
+## Voice guide
+
+The mic button (on the tower and inside the 360 viewer) opens the voice guide. It uses the browser's built in speech recognition (Chrome, Edge, Safari; set to Indian English), so there is no server or API key. It understands places (rooftop, lobby, garden or pool, aerial or location, metro, plaza), homes (3 BHK, sky villa, study, lounge), floors ("floor 12", "twelfth floor", "top floor"), units ("unit 1402"), "show available 3 BHK", "availability", "night view" or "day view", "book a demo" and "go back". Firefox and some in-app browsers have no speech recognition; there the same panel takes typed commands. To teach it new phrases, edit `parseCommand` in `src/voice.js`.
 
 ## Environment variables
 
@@ -114,13 +123,13 @@ npm run inventory
 
 The landing uses the stills in `assets/landing/` (`hero_dusk.jpg` and `hero_day.jpg`, identical framing) and `data/tower-views.json`.
 
-For each view, `faces` lists the visible facades as four corners in image pixels: `tl` and `tr` at the top of the 24th floor, `bl` and `br` at the bottom of the 1st floor (the top of the lobby). The app splits each facade into 24 floors with a perspective correct mapping, so the outlines follow the photo.
+For each view, `faces` lists the visible facades. Each face gives its left and right edge (`x0`, `x1`) and `levels`: the slab lines between floors as measured on the photo, from the top of the lobby (`levels[0]`) up to the roof slab. Each level is `[y at x0, y at x1]` in image pixels, so a building with 19 floors has 20 levels. Measuring the real lines (rather than dividing the facade evenly) keeps the boxes on the floors even where the top floor is taller.
 
 To replace or re-measure an image:
 
-1. Put the new JPGs in `assets/landing/` with the same names (or add a view to `tower-views.json`).
-2. Open the site with `?dev=1`, go to that angle and click each facade corner. The pixel position is logged and copied.
-3. Update the corners in `data/tower-views.json` and refresh.
+1. Put the new JPGs in `assets/landing/` as `hero_dusk.jpg` and `hero_day.jpg` (same framing).
+2. Open the site with `?dev=1` and click points on a slab line near each edge of a face. The pixel position is logged and copied.
+3. Update `levels` in `data/tower-views.json` and refresh. The floor count in `tower-views.json` must match the floors in `data/inventory.json`.
 
 Each face also has a compass `side` (`S` for the left face and `E` for the right face in the current photo). It decides which part of the facade lights up for a home: Type A homes own the face they look onto, and the Type B E and W villas also wrap half of the S face. Homes on hidden sides show a note instead.
 
@@ -182,6 +191,7 @@ src/viewer.js         360 viewer, hotspots, gyroscope, dev mode
 src/plans.js          Indicative SVG plans and floor key plan
 src/cost.js           Indicative cost sheet
 src/lead.js           Lead gate and webhook
+src/voice.js          Voice guide: speech recognition and command parsing
 src/analytics.js      GA4 loader and events
 src/styles.css        All styles
 data/inventory.json   Units and pricing (runtime)

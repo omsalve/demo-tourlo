@@ -7,7 +7,7 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
 // Small deterministic PRNG so the output is stable between runs.
-let seed = 20261028;
+let seed = 20261112;
 const rand = () => {
   seed = (seed * 1664525 + 1013904223) % 4294967296;
   return seed / 4294967296;
@@ -36,9 +36,13 @@ const typeB = [
   { pos: 2, facing: 'W', carpet: 3085 },
 ];
 
+// Matches the building in the landing photo: 19 floors, sky villas on the top three.
+const FLOORS = 19;
+const VILLA_FROM = 17;
+
 const units = [];
-for (let floor = 1; floor <= 24; floor++) {
-  const isB = floor > 20;
+for (let floor = 1; floor <= FLOORS; floor++) {
+  const isB = floor >= VILLA_FROM;
   for (const u of isB ? typeB : typeA) {
     const type = isB ? 'B' : 'A';
     const carpet = u.carpet;
@@ -60,15 +64,15 @@ for (let floor = 1; floor <= 24; floor++) {
   }
 }
 
-// Status mix: roughly 55% available, 15% held, 30% sold.
-// Lower floors sell first, so bias "sold" towards them for realism.
+// Status mix: roughly 55% available, 15% held, 30% sold, scattered across the tower
+// so neighbouring floors look different (a mild lean towards lower floors selling first).
 const n = units.length;
 const soldTarget = Math.round(n * 0.3);
 const heldTarget = Math.round(n * 0.15);
-const scored = units.map((u, i) => ({ i, score: rand() + (24 - u.floor) / 40 }));
-scored.sort((a, b) => b.score - a.score);
-scored.slice(0, soldTarget).forEach(({ i }) => (units[i].status = 'sold'));
-const rest = scored.slice(soldTarget).map(({ i }) => i);
+const order = units.map((u, i) => ({ i, score: rand() + (FLOORS - u.floor) / (FLOORS * 6) }));
+order.sort((a, b) => b.score - a.score);
+order.slice(0, soldTarget).forEach(({ i }) => (units[i].status = 'sold'));
+const rest = order.slice(soldTarget).map(({ i }) => i);
 for (let k = rest.length - 1; k > 0; k--) {
   const j = Math.floor(rand() * (k + 1));
   [rest[k], rest[j]] = [rest[j], rest[k]];

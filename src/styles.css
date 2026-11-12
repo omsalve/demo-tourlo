@@ -2108,3 +2108,134 @@ input[type='range']:focus-visible::-webkit-slider-thumb {
   stroke: rgba(246, 220, 160, 0.6);
   stroke-width: 1;
 }
+
+/* ---------- Voice guide ---------- */
+
+.voice-btn {
+  color: var(--gold);
+  border-color: rgba(201, 164, 92, 0.6);
+}
+
+.voice-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: end center;
+  padding: 16px 16px calc(16px + var(--safe-b));
+  background: rgba(5, 5, 6, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fade-in 0.2s ease;
+}
+
+@media (min-width: 900px) {
+  .voice-panel {
+    place-items: center;
+  }
+}
+
+.voice-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: 26px 20px 20px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow);
+  text-align: center;
+  animation: rise 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.voice-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.voice-orb {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin: 4px auto 14px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--gold);
+  color: #17140f;
+  display: grid;
+  place-items: center;
+}
+
+.voice-orb svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 2;
+}
+
+.voice-orb[disabled] {
+  opacity: 0.35;
+}
+
+.is-listening .voice-orb::before,
+.is-listening .voice-orb::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  animation: pulse 1.6s ease-out infinite;
+}
+
+.is-listening .voice-orb::after {
+  animation-delay: 0.8s;
+}
+
+.voice-status {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.voice-heard {
+  min-height: 20px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.voice-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.voice-form input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  font-size: 16px;
+  outline: none;
+}
+
+.voice-form input:focus {
+  border-color: var(--gold);
+}
+
+.voice-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.voice-chips .chip {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}

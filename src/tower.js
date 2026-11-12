@@ -4,8 +4,8 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 // Massing dimensions in scene units (roughly metres).
-const FLOORS = 24;
-const VILLA_FROM = 21;
+const FLOORS = 19;
+const VILLA_FROM = 17;
 const FLOOR_H = 3.3;
 const PODIUM = { w: 54, h: 10, d: 40 };
 const TOWER = { w: 28, d: 18, z: -4 };

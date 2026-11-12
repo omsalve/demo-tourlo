@@ -34,6 +34,21 @@ function squareToQuad({ tl, tr, br, bl }) {
   };
 }
 
+// Corners of one floor on one face, between u0 and u1 across the face (0 left edge, 1 right edge).
+// Faces with measured slab lines ("levels") use them directly; otherwise the face is split evenly.
+function bandQuad(face, floor, floors, u0 = 0, u1 = 1) {
+  if (face.levels) {
+    const lo = face.levels[floor - 1];
+    const hi = face.levels[floor];
+    const at = (line, u) => [face.x0 + (face.x1 - face.x0) * u, line[0] + (line[1] - line[0]) * u];
+    return [at(hi, u0), at(hi, u1), at(lo, u1), at(lo, u0)];
+  }
+  const P = squareToQuad(face);
+  const vt = 1 - floor / floors;
+  const vb = 1 - (floor - 1) / floors;
+  return [P(u0, vt), P(u1, vt), P(u1, vb), P(u0, vb)];
+}
+
 const ARROW_L = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
 const ARROW_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 
@@ -126,26 +141,19 @@ export class PhotoTower {
   /* ---------- Floors ---------- */
 
   buildFloors() {
-    const faces = this.view.faces.map(squareToQuad);
+    const faces = this.view.faces;
     const n = this.floors;
     const fmt = ([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
     this.floorCenters = new Map();
     let svg = '';
     for (let f = 1; f <= n; f++) {
-      const vt = 1 - f / n;
-      const vb = 1 - (f - 1) / n;
-      let sumX = 0;
-      let sumY = 0;
-      const polys = faces
-        .map((P) => {
-          const pts = [P(0, vt), P(1, vt), P(1, vb), P(0, vb)];
-          sumX += pts.reduce((s, p) => s + p[0], 0) / 4;
-          sumY += pts.reduce((s, p) => s + p[1], 0) / 4;
-          return `<polygon points="${pts.map(fmt).join(' ')}"/>`;
-        })
-        .join('');
-      this.floorCenters.set(f, { x: sumX / faces.length, y: sumY / faces.length });
-      svg += `<g class="floor" data-floor="${f}">${polys}</g>`;
+      const quads = faces.map((face) => bandQuad(face, f, n));
+      const pts = quads.flat();
+      this.floorCenters.set(f, {
+        x: pts.reduce((s, p) => s + p[0], 0) / pts.length,
+        y: pts.reduce((s, p) => s + p[1], 0) / pts.length,
+      });
+      svg += `<g class="floor" data-floor="${f}">${quads.map((q) => `<polygon points="${q.map(fmt).join(' ')}"/>`).join('')}</g>`;
     }
     svg += '<g class="unit-hl" aria-hidden="true"></g>';
     this.svg.innerHTML = svg;
@@ -183,18 +191,13 @@ export class PhotoTower {
       layer.innerHTML = '';
       return;
     }
-    const n = this.floors;
-    const vt = 1 - u.floor / n;
-    const vb = 1 - (u.floor - 1) / n;
     const fmt = ([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
     const spans = this.unitSpans(u);
     layer.innerHTML = this.view.faces
       .map((face, i) => {
         const span = spans[i];
         if (!span) return '';
-        const P = squareToQuad(face);
-        const pts = [P(span[0], vt), P(span[1], vt), P(span[1], vb), P(span[0], vb)];
-        return `<polygon points="${pts.map(fmt).join(' ')}"/>`;
+        return `<polygon points="${bandQuad(face, u.floor, this.floors, span[0], span[1]).map(fmt).join(' ')}"/>`;
       })
       .join('');
   }
