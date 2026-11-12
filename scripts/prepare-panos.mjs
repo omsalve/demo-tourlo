@@ -6,9 +6,9 @@ import path from 'node:path';
 import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const src = path.join(root, 'assets/panos');
-const mobile = path.join(root, 'assets/panos-mobile');
-const thumbs = path.join(root, 'assets/thumbs');
+const src = path.join(root, 'public/assets/panos');
+const mobile = path.join(root, 'public/assets/panos-mobile');
+const thumbs = path.join(root, 'public/assets/thumbs');
 const force = process.argv.includes('--force');
 
 const exists = (p) => access(p).then(() => true, () => false);

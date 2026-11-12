@@ -6,16 +6,16 @@ Tourlo (tourlo.in) is an immersive real estate sales gallery used by developers 
 Demo project name: **Tourlo Demo Residences** (fictional, Mumbai).
 
 ## Stack
-- Vite + vanilla JS (or React if clearly better), Three.js for the tower and the 360 viewer.
+- Next.js (App Router) shell; the demo itself is vanilla JS modules in `lib/` booted client side, with Three.js for the tower and the 360 viewer. (Originally built on Vite; converted to Next.js.)
 - No backend. Static site deployable on Vercel.
 - Must work inside an iframe.
 
 ## Assets already in this repo
-`assets/panos/` (4096x2048 equirectangular JPG, desktop) and `assets/panos-mobile/` (2048x1024, phones):
+`public/assets/panos/` (4096x2048 equirectangular JPG, desktop) and `public/assets/panos-mobile/` (2048x1024, phones):
 - Type A, 3 BHK apartment: `typeA_living.jpg`, `typeA_living_dining.jpg`, `typeA_study.jpg`
 - Type B, 4 BHK sky villa (duplex): `typeB_living.jpg`, `typeB_lounge.jpg`, `typeB_stair_dining.jpg`
 - Amenity, landscaped garden: `amenity_garden_1.jpg`, `amenity_garden_2.jpg`
-- Optional: `assets/views/balcony_view.jpg`. If this file exists, show a "View from balcony" button in Type A. If not, hide the button.
+- Optional: `public/assets/views/balcony_view.jpg`. If this file exists, show a "View from balcony" button in Type A. If not, hide the button.
 
 There are NO tower renders, floor masks, night versions, unfurnished versions or floor plan images. Do not show toggles for assets that do not exist.
 
@@ -30,7 +30,7 @@ There are NO tower renders, floor masks, night versions, unfurnished versions or
 - Podium has a "Landscaped Garden" hotspot that opens the amenity panos.
 
 ### 2. Live inventory
-- Create `data/inventory.json` with dummy data for every unit: unit number, floor, type, BHK, carpet area (sq ft), facing (N/E/S/W), status (available / held / sold, roughly 55/15/30), price in INR shown as Cr or Lakh.
+- Create `public/data/inventory.json` with dummy data for every unit: unit number, floor, type, BHK, carpet area (sq ft), facing (N/E/S/W), status (available / held / sold, roughly 55/15/30), price in INR shown as Cr or Lakh.
 - Tapping a floor opens a side panel (bottom sheet on mobile) with that floor's units colored by status.
 - Filters: BHK, status, price range, facing. Matching floors glow on the tower.
 
@@ -43,7 +43,7 @@ There are NO tower renders, floor masks, night versions, unfurnished versions or
 ### 4. 360 viewer
 - Drag/swipe to look around, pinch/scroll to zoom (limited FOV range), gyroscope on mobile if permitted.
 - Room switcher thumbnails plus clickable hotspots between rooms of the same unit.
-- Add a hidden dev mode (`?dev=1`): clicking in the pano logs and copies yaw/pitch so hotspot positions can be set by hand in a `data/hotspots.json` file. Use sensible placeholder positions until then.
+- Add a hidden dev mode (`?dev=1`): clicking in the pano logs and copies yaw/pitch so hotspot positions can be set by hand in a `public/data/hotspots.json` file. Use sensible placeholder positions until then.
 - Load the mobile pano on small screens and desktop pano on large screens. Show a loader and fade between rooms.
 
 ### 5. Lead capture
