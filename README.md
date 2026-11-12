@@ -31,6 +31,8 @@ Browser lead/inventory tests mock remote responses. The Sheets script test uses 
 
 Use only the private repository sudarshanknows/tourlo-residences-v2 and Vercel project tourlo-residences-v2 in team tourlo. The original-readonly remote has a disabled push URL. The original-preserved branch points to the original reviewed commit.
 
+V2 preview: https://tourlo-residences-v2-tourlo.vercel.app/ (team deployment protection applies). The initial release was uploaded directly from the committed source because Vercel's GitHub installation cannot currently see the new private repository. Automatic deployment on GitHub push is not connected. The new Vercel project ID is prj_njngtzavCv1NXa81MMeQpo7wDVGv.
+
 Server configuration: GOOGLE_SCRIPT_URL and GOOGLE_SCRIPT_SECRET. Never prefix those keys with VITE_ or ship secrets to the browser. Optional VITE_GA_ID enables existing analytics. The original Vercel project and original GitHub repository remain unchanged.
 
 ## Visual accuracy
