@@ -1,7 +1,7 @@
 const env = import.meta.env;
 
 export const config = {
-  leadWebhook: (env.VITE_LEAD_WEBHOOK || '').trim(),
+  leadWebhook: '/api/leads',
   gaId: (env.VITE_GA_ID || '').trim(),
   bookingUrl: (env.VITE_BOOKING_URL || '').trim() || 'https://tourlo.in',
   dev: new URLSearchParams(location.search).get('dev') === '1',

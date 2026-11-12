@@ -1,0 +1,13 @@
+import { chromium } from '@playwright/test';
+import fs from 'node:fs/promises';
+await fs.mkdir('review',{recursive:true});
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://127.0.0.1:4173/');await page.locator('#boot-loader').waitFor({state:'detached'});
+await page.screenshot({path:'review/desktop-home.png'});
+await page.getByRole('button',{name:'Start guided visit'}).click();
+await page.waitForFunction(()=>document.querySelector('#viewer-room').textContent==='Arrival plaza');
+await page.screenshot({path:'review/desktop-guided.png'});
+console.log(JSON.stringify({errors,viewer:await page.locator('#viewer-room').textContent(),guideVisible:await page.locator('#guided-journey').isVisible()}));
+await browser.close();

@@ -18,10 +18,10 @@
 
       <header class="topbar">
         <div class="brand">
-          <span class="wordmark">Tourlo</span>
-          <span class="project">Demo Residences, Mumbai</span>
+          <span class="wordmark">Tourlo <span class="brand-residences">Demo Residences</span></span>
+          <span class="project">Mumbai · A new perspective on home</span>
         </div>
-        <a class="btn btn-gold btn-sm cta-book" data-cta="topbar" target="_blank" rel="noopener">Book a full live demo</a>
+        <nav class="header-nav" aria-label="Explore the residences"><button id="btn-guide">Guided visit</button><button id="btn-residences">Residences</button><button id="btn-saved">Saved homes <span id="saved-count">0</span></button><a class="btn btn-gold btn-sm cta-book" data-cta="topbar">Enquire</a></nav>
       </header>
 
       <div class="floor-tip" id="floor-tip" hidden></div>
@@ -33,8 +33,8 @@
           <span class="badge" id="filter-count" hidden>0</span>
         </button>
         <div class="hint" id="hint">
-          <span class="hint-main">Tap a floor to see live inventory</span>
-          <span class="hint-sub" id="hint-sub"></span>
+          <span class="hint-main">Tap a floor to explore</span>
+          <span class="hint-sub" id="hint-sub"></span><span id="inventory-status">Sample availability</span>
         </div>
         <button class="pill-btn icon-only" id="btn-daynight" type="button" aria-pressed="false" aria-label="Switch to night view">
           <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /></svg>
@@ -92,16 +92,16 @@
 
     <div class="modal" id="final-modal" hidden role="dialog" aria-modal="true" aria-labelledby="final-title">
       <div class="modal-card final-card">
-        <span class="eyebrow">Tourlo sales gallery</span>
-        <h2 id="final-title">Imagine this for your project</h2>
-        <p>You just walked through a live tower, real time inventory and 360 homes. In a full live demo we show how your sales team runs site visits, shares units with buyers and tracks every lead.</p>
-        <a class="btn btn-gold btn-block cta-book" data-cta="final_card" target="_blank" rel="noopener">Book a full live demo</a>
+        <span class="eyebrow">Tourlo Demo Residences</span>
+        <h2 id="final-title">Could this be your next address?</h2>
+        <p>Explore another home, build your shortlist or leave your details to speak with our team.</p>
+        <a class="btn btn-gold btn-block cta-book" data-cta="final_card">Enquire about a residence</a>
         <button class="btn btn-ghost btn-block" type="button" id="final-close">Keep exploring</button>
       </div>
     </div>
 
     <div class="lightbox" id="lightbox" hidden>
-      <img id="lightbox-img" alt="View from the balcony" />
+      <img id="lightbox-img" alt="Representative neighbourhood outlook" /><p class="view-caption">Representative outlook. Actual views vary by floor and facing.</p>
       <button class="pill-btn icon-only lightbox-close" id="lightbox-close" type="button" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>
@@ -109,6 +109,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+    <link rel="stylesheet" href="/src/v2.css" />
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

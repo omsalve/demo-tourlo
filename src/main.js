@@ -6,6 +6,10 @@ import { planFor, floorplate } from './plans.js';
 import { costSheetHTML } from './cost.js';
 import { LeadGate } from './lead.js';
 import { VoiceAssistant } from './voice.js';
+import { GuidedJourney } from './journey.js';
+import { SavedHomes } from './saved-homes.js';
+import { setupDialogFocus } from './accessibility.js';
+import { watchInventory } from './inventory.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -39,16 +43,19 @@ const state = {
 let tower;
 let viewer;
 let lead;
+let journey;
+let saved;
 
 /* ---------------- Boot ---------------- */
 
 async function boot() {
   initAnalytics();
+  setupDialogFocus();
   setupCTAs();
   setupToast();
 
   lead = new LeadGate({
-    getContext: () => ({ lastFloor: state.floor, lastUnit: state.unit?.unit || null, roomsViewed: [...state.roomsSeen] }),
+    getContext: () => ({ lastFloor: state.floor, lastUnit: state.unit?.unit || null, roomsViewed: [...state.roomsSeen], savedHomes: saved?.ids || [], journeyStep: journey?.active ? journey.step : null }),
   });
   trackTimeSpent(() => lead.activeSeconds);
 
@@ -87,18 +94,21 @@ async function boot() {
   }
   setupSiteNav();
   setupVoice();
+  setupJourney();
+  setupSavedHomes();
   setupIntro();
   setupDayNight();
   setupPanel();
   setupFilters();
   setupAvailability();
+  watchInventory(updateInventory, () => setInventoryStatus(false));
 
   window.addEventListener('resize', () => {
     tower.resize();
     updateInset();
   });
 
-  if (!state.photo) hideBootLoader();
+  if (!state.photo) { hideBootLoader(); openDeepLink(); }
 }
 
 function hideBootLoader() {
@@ -120,6 +130,13 @@ async function createTower() {
   if (!want3d) {
     try {
       const views = await fetch(url('data/tower-views.json')).then((r) => r.json());
+      await new Promise((resolve, reject) => {
+        const image = new Image();
+        const timer = setTimeout(() => reject(new Error('Tower image timed out')), 12000);
+        image.onload = () => { clearTimeout(timer); resolve(); };
+        image.onerror = () => { clearTimeout(timer); reject(new Error('Tower image unavailable')); };
+        image.src = url(views.views[0].dusk);
+      });
       const { PhotoTower } = await import('./photo-tower.js');
       state.photo = true;
       $('#tower-canvas').hidden = true;
@@ -151,8 +168,9 @@ async function createTower() {
 
 function setupCTAs() {
   document.querySelectorAll('.cta-book').forEach((a) => {
-    a.href = config.bookingUrl;
-    a.addEventListener('click', () => track('book_demo_click', { location: a.dataset.cta }));
+    a.href = '#enquire';
+    a.removeAttribute('target');
+    a.addEventListener('click', (e) => { e.preventDefault(); enquire(); track('book_demo_click', { location: a.dataset.cta }); });
   });
   $('#final-close').addEventListener('click', () => ($('#final-modal').hidden = true));
   $('#final-modal').addEventListener('click', (e) => {
@@ -246,16 +264,16 @@ function setupSiteNav() {
 }
 
 function setupIntro() {
-  if (!state.photo || session.get('tourlo_intro_seen') === '1') return;
+  if (new URLSearchParams(location.search).has('unit')) return;
   const el = document.createElement('section');
   el.className = 'intro-card';
   el.innerHTML = `
-    <span class="eyebrow">Tourlo Demo Residences, Mumbai</span>
-    <h1>19 storeys of light, greenery and city views</h1>
-    <p>3 BHK residences and 4 BHK sky villas beside the metro. Tap any floor to see live availability, or walk the site in 360.</p>
+    <span class="eyebrow">Welcome home · Mumbai</span>
+    <h1>Discover your<br>next address.</h1>
+    <p>19 storeys of light, greenery and city views. Explore the arrival, amenities and residences at your own pace.</p>
     <div class="intro-actions">
-      <button class="btn btn-gold" type="button" data-intro="explore">Explore the tower</button>
-      <button class="btn btn-ghost" type="button" data-intro="walk">Walk the site</button>
+      <button class="btn btn-gold" type="button" data-intro="guided">Start guided visit <span aria-hidden="true">→</span></button>
+      <button class="btn btn-ghost" type="button" data-intro="explore">Explore freely</button>
     </div>`;
   const close = () => {
     session.set('tourlo_intro_seen', '1');
@@ -267,7 +285,7 @@ function setupIntro() {
     if (!a) return;
     close();
     if (a === 'explore') tower.sweep?.();
-    if (a === 'walk') openTour('site', 'ext_plaza');
+    if (a === 'guided') journey.start();
   });
   app.querySelector('.photo-stage')?.addEventListener('pointerdown', close, { once: true });
   app.appendChild(el);
@@ -354,8 +372,9 @@ function setupPanel() {
     if (a === 'floor-down') guarded(() => openFloor(Math.max(1, state.floor - 1), 'stepper'));
     if (a === 'unit') guarded(() => openUnit(t.dataset.unit));
     if (a === 'back') openFloor(state.floor);
-    if (a === 'step-inside') openTour(state.unit.type === 'B' ? 'typeB' : 'typeA');
+    if (a === 'step-inside') { if(journey.active)journey.setStep(3); openTour(state.unit.type === 'B' ? 'typeB' : 'typeA'); }
     if (a === 'balcony') openLightbox();
+    if (a === 'save') toggleSaved(state.unit.unit);
   });
   panel.addEventListener('keydown', (e) => {
     const g = e.target.closest('.floorplate .u');
@@ -372,7 +391,8 @@ function setupPanel() {
 
 // Runs fn now, or after the lead form is completed when the gate is active.
 function guarded(fn) {
-  if (lead.guard(fn)) fn();
+  if (lead.guard(fn)) { fn(); return true; }
+  return false;
 }
 
 function bindSheetDrag(handle, sheet) {
@@ -469,7 +489,7 @@ function openUnit(unitNo) {
   }
   const onFacade = tower.highlightUnit ? tower.highlightUnit(u) : null;
   const villa = u.type === 'B';
-  const showBalcony = state.balcony && !villa;
+  const showBalcony = state.balcony;
   const facadeNote =
     onFacade === null
       ? ''
@@ -489,6 +509,7 @@ function openUnit(unitNo) {
     ${facadeNote}
     <div class="unit-actions">
       <button class="btn btn-gold btn-block" type="button" data-action="step-inside">${ICON.pano}Step inside</button>
+      <button class="btn btn-ghost btn-block save-home" type="button" data-action="save" aria-pressed="${saved.has(u.unit)}">${saved.has(u.unit) ? "♥ Saved home" : "♡ Save home"}</button>
       ${showBalcony ? `<button class="btn btn-ghost btn-block" type="button" data-action="balcony">${ICON.view}View from balcony</button>` : ''}
       <div class="share-row">
         <a class="btn btn-ghost" data-share="whatsapp" href="${esc(whatsappLink(u))}" target="_blank" rel="noopener">${ICON.share}WhatsApp</a>
@@ -512,11 +533,11 @@ function openUnit(unitNo) {
     </div>
     ${costSheetHTML(u, state.inventory.pricing)}
     <div class="card">
-      <h3>See this with your own project</h3>
-      <p class="fineprint" style="margin:0 0 12px">Tourlo turns your inventory, plans and renders into a live sales gallery like this one.</p>
-      <a class="btn btn-gold btn-block cta-book" data-cta="unit_view" href="${esc(config.bookingUrl)}" target="_blank" rel="noopener">Book a full live demo</a>
+      <h3>Make room for your next chapter</h3>
+      <p class="fineprint" style="margin:0 0 12px">Save this home, explore its spaces or speak with our team. Interiors and plans represent the home type.</p>
+      <a class="btn btn-gold btn-block cta-book" data-cta="unit_view" href="#enquire">Enquire about this home</a>
     </div>`;
-  $('#panel-body').querySelector('.cta-book').addEventListener('click', () => track('book_demo_click', { location: 'unit_view' }));
+  $('#panel-body').querySelector('.cta-book').addEventListener('click', (e) => { e.preventDefault(); enquire(); track('book_demo_click', { location: 'unit_view' }); });
   $('#panel-body').querySelector('[data-share="whatsapp"]').addEventListener('click', (e) => shareUnit(u, e));
   $('#panel-body').querySelector('[data-share="copy"]').addEventListener('click', () => copyUnitLink(u));
   $('#panel-body').scrollTop = 0;
@@ -782,7 +803,7 @@ async function ensureViewer() {
     onClose: () => {
       tower.setActive(true);
       if (state.quietClose) state.quietClose = false;
-      else if (session.get('tourlo_final_shown') !== '1') {
+      else if (!journey?.active && session.get('tourlo_final_shown') !== '1') {
         session.set('tourlo_final_shown', '1');
         $('#final-modal').hidden = false;
       }
@@ -791,7 +812,7 @@ async function ensureViewer() {
   return viewer;
 }
 
-async function openTour(tourId, roomId) {
+async function openTour(tourId, roomId, onOpened) {
   const tour = state.tours?.[tourId];
   if (!tour) return;
   const startRoom = roomId || tour.rooms[0].id;
@@ -799,15 +820,19 @@ async function openTour(tourId, roomId) {
     // A second room (beyond the first ever viewed) counts as the gate trigger.
     if (!lead.unlocked && state.roomsSeen.size >= 1 && !state.roomsSeen.has(startRoom)) {
       lead.trigger('second_room');
-      lead.pending = () => openTour(tourId, roomId);
-      return;
+      lead.pending = () => openTour(tourId, roomId, onOpened);
+      return false;
     }
     state.tourId = tourId;
-    const v = await ensureViewer();
+  let v;
+  try { v = await ensureViewer(); } catch { toast('360 is unavailable on this device. You can still explore the plans and compare homes.'); return false; }
     tower.setActive(false);
     v.start(tour, startRoom);
+    onOpened?.();
+    return true;
   };
-  if (lead.guard(go)) go();
+  if (lead.guard(go)) return go();
+  return false;
 }
 
 /* ---------------- Voice guide ---------------- */
@@ -896,9 +921,13 @@ function runVoiceCommand(cmd) {
       openLightbox();
       return 'Here is the view from the balcony.';
     case 'book':
-      leaveViewer();
-      $('#final-modal').hidden = false;
-      return 'Here is how to book a full live demo.';
+      enquire();
+      return 'Share your details to enquire about this residence.';
+    case 'guided': journey.start(); return 'Starting your guided visit.';
+    case 'next': if (!journey.active) return false; journey.go(Math.min(4,journey.step+1)); return 'Opening the next stage.';
+    case 'previous': if (!journey.active) return false; journey.go(Math.max(0,journey.step-1)); return 'Opening the previous stage.';
+    case 'compare': saved.open(); return 'Here are your saved homes.';
+    case 'save': if (!state.unit) { toast('Choose a home first'); return false; } toggleSaved(state.unit.unit); return 'Your shortlist has been updated.';
     case 'home':
       leaveViewer();
       closeLightbox();
@@ -913,7 +942,8 @@ function runVoiceCommand(cmd) {
 /* ---------------- Balcony lightbox ---------------- */
 
 function openLightbox() {
-  $('#lightbox-img').src = url('assets/views/balcony_view.jpg');
+  $('#lightbox-img').src = url(state.unit?.floor >= 17 ? 'assets/views/balcony_view_high.jpg' : 'assets/views/balcony_view.jpg');
+  $('#lightbox-img').alt = 'Representative neighbourhood outlook, not an exact unit-specific view';
   $('#lightbox').hidden = false;
   track('pano_open', { tour: 'balcony_view', room: 'balcony_view' });
 }
@@ -924,5 +954,61 @@ function closeLightbox() {
 
 $('#lightbox-close').addEventListener('click', closeLightbox);
 $('#lightbox').addEventListener('click', (e) => e.target.id === 'lightbox' && closeLightbox());
+
+function enquire() {
+  $('#final-modal').hidden = true;
+  lead.reason = 'enquiry';
+  lead.show();
+}
+
+function toggleSaved(id) {
+  if (!saved.toggle(id)) return toast('You can compare up to three homes. Remove one to add another.');
+  const b=$('.save-home'); if(b && state.unit?.unit===id){b.textContent=saved.has(id)?'♥ Saved home':'♡ Save home';b.setAttribute('aria-pressed',String(saved.has(id)));}
+  toast(saved.has(id)?'Home saved to your shortlist':'Home removed');
+  track('home_saved',{unit:id,saved:saved.has(id)});
+}
+
+function setupSavedHomes() {
+  saved=new SavedHomes({ getInventory:()=>state.inventory, onOpen:id=>guarded(()=>{leaveViewer();openUnit(id);}), onBrowse:()=>{leaveViewer();browseHomes();}, onChange:ids=>{$('#saved-count').textContent=ids.length;} });
+  $('#saved-count').textContent=saved.ids.length;
+  $('#btn-saved').addEventListener('click',()=>saved.open());
+  $('#btn-residences').addEventListener('click',()=>{dismissIntro();leaveViewer();guarded(browseHomes);});
+  $('#btn-guide').addEventListener('click',()=>{dismissIntro();journey.start();});
+}
+
+function dismissIntro(){ $('.intro-card')?.remove(); }
+function browseHomes(){
+  const homes=state.inventory.units.filter(matches);
+  $('#panel-body').innerHTML='<div class="panel-head"><div><span class="eyebrow">Find your home</span><h2 id="panel-title">The residences</h2><p>'+homes.length+' homes match your preferences</p></div><button class="icon-btn" data-action="close" aria-label="Close residences">×</button></div><p class="fineprint">Choose a residence to view its plan, explore inside and save it for comparison.</p><div class="unit-list">'+homes.map(u=>'<button class="unit-card" data-action="unit" data-unit="'+esc(u.unit)+'"><span class="u-no">Residence '+esc(u.unit)+'</span><span class="u-price">'+inr(u.price)+'</span><span class="u-meta">'+u.bhk+' BHK · Floor '+u.floor+' · '+sqft(u.carpetArea)+'</span><span class="u-status status-tag s-'+u.status+'">'+STATUS[u.status]+'</span></button>').join('')+'</div>';
+  state.floor=null;state.unit=null;tower.selectFloor(null);openSheet($('#panel'));
+}
+
+function setupJourney(){
+  journey=new GuidedJourney({
+    onStep:async step=>{
+      dismissIntro(); saved?.close(); $('#final-modal').hidden=true; closeLightbox();
+      if(step===0 || step===1){closeSheet($('#panel'));closeSheet($('#filters')); return openTour('site',step===0?'ext_plaza':'ext_podium',()=>journey.setStep(step));}
+      if(step===2){return guarded(()=>{leaveViewer();browseHomes();journey.setStep(step);});}
+      if(step===3){if(!state.unit){leaveViewer();guarded(browseHomes);toast('Choose a residence, then select Step inside');return false;}return openTour(state.unit.type==='B'?'typeB':'typeA',undefined,()=>journey.setStep(step));}
+      if(step===4){return guarded(()=>{leaveViewer();saved.open();journey.setStep(step);});}
+      return true;
+    },onExit:()=>{toast('Explore freely. Restart the guide whenever you like.');},onChange:step=>track('journey_step',{step})
+  });
+}
+
+function setInventoryStatus(live){
+  const el=$('#inventory-status'); if(el){el.textContent=live?'Availability updated':'Sample availability';el.classList.toggle('is-live',live);}
+}
+function updateInventory(data){
+  setInventoryStatus(data.source==='google-sheets');
+  if(JSON.stringify(data.units)===JSON.stringify(state.inventory.units))return;
+  const unitId=state.unit?.unit;const floor=state.floor;
+  state.inventory={...state.inventory,...data};state.byFloor=new Map();
+  for(const u of data.units){if(!state.byFloor.has(u.floor))state.byFloor.set(u.floor,[]);state.byFloor.get(u.floor).push(u);}
+  updateHint();applyFilters();
+  if($('#btn-availability')?.getAttribute('aria-pressed')==='true')tower.setAvailability(floorAvailability());
+  if(!$('#panel').hidden){if(unitId)openUnit(unitId);else if(floor)openFloor(floor);else browseHomes();}
+  if(!saved.el.hidden)saved.render();
+}
 
 boot();

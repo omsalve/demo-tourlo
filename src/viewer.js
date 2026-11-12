@@ -39,6 +39,14 @@ export class PanoViewer {
     this.roomsEl = root.querySelector('#viewer-rooms');
     this.gyroBtn = root.querySelector('#btn-gyro');
     this.devEl = root.querySelector('#dev-readout');
+    this.errorEl = document.createElement('div');
+    this.errorEl.className = 'viewer-error';
+    this.errorEl.hidden = true;
+    this.errorEl.setAttribute('role', 'alert');
+    this.errorEl.innerHTML = '<p>This view could not load. Your place in the visit is saved.</p><button class="btn btn-gold" type="button" data-retry>Try view again</button><button class="btn btn-ghost" type="button" data-back>Return to residences</button>';
+    root.appendChild(this.errorEl);
+    this.errorEl.querySelector('[data-retry]').addEventListener('click', () => this.go(this.failedRoom, { initial: !this.room }));
+    this.errorEl.querySelector('[data-back]').addEventListener('click', () => this.close());
 
     this.yaw = 0;
     this.pitch = 0;
@@ -100,6 +108,12 @@ export class PanoViewer {
   close() {
     if (!this.open) return;
     this.open = false;
+    this.loadVersion = (this.loadVersion || 0) + 1;
+    this.textureGeneration = (this.textureGeneration || 0) + 1;
+    this.loading = false;
+    this.fadeEl.classList.remove('is-on');
+    this.loaderEl.hidden = true;
+    this.errorEl.hidden = true;
     this.root.hidden = true;
     this.disableGyro();
     this.hotspotLayer.innerHTML = '';
@@ -130,18 +144,20 @@ export class PanoViewer {
 
   loadTexture(file) {
     if (this.cache.has(file)) return Promise.resolve(this.cache.get(file));
+    const generation = this.textureGeneration || 0;
     return new Promise((resolve, reject) => {
       new THREE.TextureLoader().load(
         this.panoUrl(file),
         (tex) => {
+          if (generation !== (this.textureGeneration || 0) || !this.open) { tex.dispose(); reject(new Error('View closed')); return; }
           tex.colorSpace = THREE.SRGBColorSpace;
           tex.minFilter = THREE.LinearFilter;
           tex.generateMipmaps = false;
           tex.anisotropy = Math.min(4, this.renderer.capabilities.getMaxAnisotropy());
           // Keep at most three textures alive to stay light on phones.
           if (this.cache.size >= 3) {
-            const [oldest] = this.cache.keys();
-            if (oldest !== this.room?.file) {
+            const oldest = [...this.cache.keys()].find(key => key !== this.room?.file);
+            if (oldest) {
               this.cache.get(oldest).dispose();
               this.cache.delete(oldest);
             }
@@ -157,22 +173,29 @@ export class PanoViewer {
 
   async go(roomId, { initial = false } = {}) {
     const room = this.tour.rooms.find((r) => r.id === roomId);
-    if (!room || room === this.room || this.loading) return;
+    if (!room || room === this.room) return;
     if (!initial && !this.canEnterRoom(room)) return;
+    this.errorEl.hidden = true;
+    const version = this.loadVersion = (this.loadVersion || 0) + 1;
     this.loading = true;
-    const loaderTimer = setTimeout(() => (this.loaderEl.hidden = false), 120);
+    const loaderTimer = setTimeout(() => {if(version===this.loadVersion&&this.open)this.loaderEl.hidden = false;}, 120);
     let tex;
     try {
       tex = await this.loadTexture(room.file);
     } catch (e) {
-      console.error('Could not load pano', room.file, e);
       clearTimeout(loaderTimer);
+      if(version!==this.loadVersion)return;
+      console.error('Could not load pano', room.file, e);
       this.loaderEl.hidden = true;
       this.loading = false;
+      this.fadeEl.classList.remove('is-on');
+      this.failedRoom = roomId;
+      this.errorEl.hidden = false;
       this.onRoomChange?.(room, { error: true });
       return;
     }
     clearTimeout(loaderTimer);
+    if(version!==this.loadVersion)return;
     this.loaderEl.hidden = true;
     if (!this.open) {
       this.loading = false;
@@ -180,6 +203,11 @@ export class PanoViewer {
     }
 
     const prev = this.room;
+    if (prev) {
+      this.fadeEl.classList.add('is-on');
+      await new Promise(resolve => setTimeout(resolve, 220));
+      if (version !== this.loadVersion || !this.open) return;
+    }
     this.room = room;
     this.hotspotLayer.innerHTML = '';
     this.roomsEl.querySelectorAll('.room-thumb').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.room === room.id)));
@@ -203,19 +231,10 @@ export class PanoViewer {
       if (this.gyro.on) this.gyro.recalibrate = true;
     };
 
-    if (!prev) {
-      setView();
-      back.material.opacity = 1;
-      this.finishSwap(back);
-    } else {
-      // Quick dip to black while the camera re-orients, then a cross fade into the new room.
-      this.fadeEl.classList.add('is-on');
-      await new Promise((r) => setTimeout(r, 260));
-      setView();
-      this.fadeEl.classList.remove('is-on');
-      back.material.opacity = 1;
-      this.finishSwap(back);
-    }
+    setView();
+    this.fadeEl.classList.remove('is-on');
+    back.material.opacity = 1;
+    this.finishSwap(back);
     this.buildHotspots();
     this.loading = false;
     this.onRoomChange?.(room, { initial });
@@ -327,6 +346,7 @@ export class PanoViewer {
 
     window.addEventListener('keydown', (e) => {
       if (!this.open) return;
+      if(e.target.closest('input,textarea,[role="dialog"],.voice-panel'))return;
       if (e.key === 'Escape') this.close();
       if (e.key === 'ArrowLeft') this.yaw -= 6;
       if (e.key === 'ArrowRight') this.yaw += 6;

@@ -1,4 +1,8 @@
 node_modules
+review/
+test-results/
+playwright-report/
+scripts/implement-v2.mjs
 dist
 .env
 .env.local

@@ -12,6 +12,9 @@ const SUGGESTIONS = [
   'Show available 3 BHK',
   'Open the sky villa',
   'Night view',
+  'Start guided visit',
+  'Save this home',
+  'Compare homes',
 ];
 
 const NUMBER_WORDS = {
@@ -27,6 +30,12 @@ const has = (text, words) => words.some((w) => new RegExp(`\\b${w}`).test(text))
 // Turns what was heard into one action. Order matters: the most specific matches come first.
 export function parseCommand(raw) {
   const text = ` ${raw.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ')} `;
+
+  if (has(text, ['guided visit', 'guided tour', 'start guide', 'start tour'])) return { type: 'guided' };
+  if (has(text, ['next step', 'next stage', 'continue tour'])) return { type: 'next' };
+  if (has(text, ['previous step', 'previous stage'])) return { type: 'previous' };
+  if (has(text, ['compare', 'shortlist', 'saved homes', 'favourites', 'favorites'])) return { type: 'compare' };
+  if (has(text, ['save this', 'save home', 'save the', 'add to saved'])) return { type: 'save' };
 
   const unit = text.match(/\b(?:unit|flat|apartment|home)\s*(?:number\s*)?(\d{3,4})\b/);
   if (unit) return { type: 'unit', unit: unit[1] };
@@ -205,7 +214,7 @@ export class VoiceAssistant {
   handle(text, via) {
     const cmd = parseCommand(text);
     this.heard.textContent = `"${text}"`;
-    this.track('voice_command', { intent: cmd.type, via, heard: text.slice(0, 80) });
+    this.track('voice_command', { intent: cmd.type, via });
     if (cmd.type === 'unknown') {
       this.status.textContent = 'Sorry, I can take you to the rooftop, lobby, garden, a floor or a home. Try one of these:';
       this.say('Sorry, I did not get that.');

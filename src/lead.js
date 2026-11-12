@@ -16,7 +16,8 @@ export class LeadGate {
     this.unlocked = session.get(KEY) === '1';
     this.required = false; // becomes true once a trigger fires
     this.activeSeconds = 0;
-    this.lastInteraction = 0;
+    this.lastInteraction = -Infinity;
+    this.submissionId = null;
     this.pending = null;
 
     const mark = () => (this.lastInteraction = performance.now());
@@ -26,7 +27,7 @@ export class LeadGate {
     // Counts seconds in which the visitor actually interacted recently.
     setInterval(() => {
       if (document.visibilityState !== 'visible') return;
-      if (performance.now() - this.lastInteraction < 12000) this.activeSeconds++;
+      if (this.modal.hidden && performance.now() - this.lastInteraction < 12000) this.activeSeconds++;
       if (!this.unlocked && !this.required && this.activeSeconds >= ACTIVE_LIMIT) this.trigger('time');
     }, 1000);
   }
@@ -53,6 +54,7 @@ export class LeadGate {
 
   show() {
     if (!this.modal.hidden) return;
+    this.returnFocus = document.activeElement;
     this.renderForm();
     this.modal.hidden = false;
     setTimeout(() => this.content.querySelector('input')?.focus({ preventScroll: true }), 50);
@@ -60,6 +62,7 @@ export class LeadGate {
 
   hide() {
     this.modal.hidden = true;
+    this.returnFocus?.focus?.();
   }
 
   renderForm() {
@@ -79,6 +82,7 @@ export class LeadGate {
           </div>
           <div class="err">Please pick your role</div>
         </div>
+        <p class="lead-error" role="alert" hidden></p>
         <div class="form-actions">
           <button class="btn btn-gold btn-block" type="submit">Continue exploring</button>
           <button class="btn btn-ghost btn-block" type="button" data-later>Not now</button>
@@ -139,6 +143,7 @@ export class LeadGate {
       phone: data.phone.trim(),
       email: data.email.trim(),
       role: data.role,
+      requestId: this.submissionId ||= crypto.randomUUID(),
       project: 'Tourlo Demo Residences',
       source: 'tourlo-web-demo',
       trigger: this.reason || 'unknown',
@@ -148,7 +153,12 @@ export class LeadGate {
       activeSeconds: this.activeSeconds,
       ...this.getContext(),
     };
-    await sendLead(payload);
+    try { await sendLead(payload); } catch (error) {
+      const message=this.content.querySelector('.lead-error');
+      message.hidden=false; message.textContent=error.message || 'Your details could not be saved. Please try again.';
+      btn.disabled=false; btn.textContent='Try again'; return;
+    }
+    this.submissionId=null;
     track('lead_submit', { role: payload.role, trigger: payload.trigger });
     this.unlocked = true;
     session.set(KEY, '1');
@@ -156,7 +166,7 @@ export class LeadGate {
       <div class="lead-done">
         <div class="check">${CHECK}</div>
         <h2 id="lead-title">Thank you, ${escapeHTML(payload.name.split(' ')[0])}</h2>
-        <p>Everything is unlocked. Enjoy the tour.</p>
+        <p>Your details have been saved. Continue your visit from where you left off.</p>
         <button class="btn btn-gold btn-block" type="button" data-done>Continue</button>
       </div>`;
     const done = () => {
@@ -174,27 +184,9 @@ function escapeHTML(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
 
-async function sendLead(payload) {
-  if (!config.leadWebhook) {
-    console.info('[lead] VITE_LEAD_WEBHOOK is not set. Lead captured locally:', payload);
-    return;
-  }
-  const body = JSON.stringify(payload);
-  try {
-    const res = await fetch(config.leadWebhook, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      keepalive: true,
-    });
-    if (!res.ok) console.warn('[lead] Webhook responded with', res.status);
-  } catch (err) {
-    // Many webhook tools (Zapier, Make, Apps Script) do not answer CORS preflights.
-    // Retry as a simple request so the data still arrives.
-    try {
-      await fetch(config.leadWebhook, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body, keepalive: true });
-    } catch (err2) {
-      console.warn('[lead] Could not reach webhook', err2);
-    }
-  }
+export async function sendLead(payload) {
+  const response=await fetch(config.leadWebhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok || result.ok!==true) throw new Error(result.error || 'Your details could not be saved. Please try again.');
+  return result;
 }

@@ -9,25 +9,25 @@
           "label": "Arrival plaza",
           "file": "ext_plaza.jpg",
           "initialYaw": 0,
-          "initialPitch": 8,
+          "initialPitch": -10,
           "hotspots": [
             {
               "to": "ext_lobby",
               "label": "Enter the lobby",
               "yaw": 0,
-              "pitch": -8
+              "pitch": -25
             },
             {
               "to": "ext_podium",
               "label": "Podium garden",
               "yaw": 110,
-              "pitch": -4
+              "pitch": -20
             },
             {
               "to": "ext_station",
               "label": "Metro station",
-              "yaw": -130,
-              "pitch": -3
+              "yaw": -108,
+              "pitch": -14
             },
             {
               "to": "ext_rooftop",
@@ -47,14 +47,14 @@
           "id": "ext_lobby",
           "label": "Lobby",
           "file": "ext_lobby.jpg",
-          "initialYaw": 150,
-          "initialPitch": 0,
+          "initialYaw": 0,
+          "initialPitch": -4,
           "hotspots": [
             {
               "to": "ext_plaza",
               "label": "Back to the plaza",
               "yaw": 0,
-              "pitch": -4
+              "pitch": -18
             },
             {
               "to": "typeA_living",
@@ -82,8 +82,8 @@
           "id": "ext_podium",
           "label": "Podium garden",
           "file": "ext_podium.jpg",
-          "initialYaw": -40,
-          "initialPitch": 4,
+          "initialYaw": 65,
+          "initialPitch": -10,
           "hotspots": [
             {
               "to": "ext_plaza",
@@ -128,8 +128,8 @@
           "id": "ext_aerial",
           "label": "Aerial view",
           "file": "ext_aerial.jpg",
-          "initialYaw": 15,
-          "initialPitch": -12,
+          "initialYaw": -20,
+          "initialPitch": -20,
           "hotspots": [
             {
               "to": "ext_plaza",
@@ -159,13 +159,13 @@
           "label": "Metro station",
           "file": "ext_station.jpg",
           "initialYaw": 0,
-          "initialPitch": 6,
+          "initialPitch": -8,
           "hotspots": [
             {
               "to": "ext_plaza",
               "label": "Walk to the plaza",
               "yaw": 0,
-              "pitch": -4
+              "pitch": -18
             },
             {
               "label": "Metro, 2 min walk",

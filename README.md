@@ -1,204 +1,40 @@
-# Tourlo Web Demo
+# Tourlo Residences V2
 
-An interactive sales gallery demo for **Tourlo Demo Residences** (fictional, Mumbai), built to embed on tourlo.in.
+A separate project-focused residential experience, preserving the original Tourlo demo at commit 86c1d7a7b3588bc8a1f4924334b90b7aa7337e4f. This is an illustrative Mumbai development with sample inventory, representative AI imagery, and indicative plans/pricing.
 
-- Photoreal tower explorer: one rendered hero with day and dusk versions, and an SVG floor overlay so every one of the 19 floors is tappable on the photo, drawn on the measured slab lines
-- "Walk the site" 360 tour of the plaza, lobby, podium garden, rooftop, aerial view and metro station, linked into the apartment interiors
-- "Availability" toggle colours every floor on the photo (green available, amber only on hold, red sold out)
-- Tapping a floor zooms the photo in on it; opening a home outlines it on the facade
-- Share a home on WhatsApp or copy its link; `?unit=1402` opens straight into that home
-- A slow cinematic push in when the landing opens
-- Voice guide: tap the mic and say "take me to the rooftop", "go to floor 12", "show available 3 BHK" or "night view" (typed commands work in every browser)
-- A Three.js massing model of the tower as a fallback (`?view=3d`)
-- Live inventory from `data/inventory.json` with filters (BHK, status, price, facing). Matching floors glow on the tower
-- Unit view with an indicative SVG plan, specs, and an indicative cost sheet
-- 360 viewer with drag, pinch or scroll zoom, gyroscope on phones, room thumbnails and hotspots between rooms
-- Lead form after about 60 seconds of interaction or when a second 360 room is opened
-- Optional GA4 events and a persistent "Book a full live demo" call to action
+## What's included
 
-Vite and vanilla JS. No backend. The landing loads about 0.9 MB (one hero photo plus code); other angles and panos load as they are needed.
+- Guided visit: arrival, amenities, choose a home, step inside, compare; free exploration remains available.
+- 16 new coordinated visual assets: paired day/dusk hero, six site scenes, six apartment scenes and two representative balcony views. Optimized mobile textures and thumbnails.
+- Recalibrated clickable tower floors, 70 homes across 19 levels, filters and indicative cost sheets.
+- Save up to three homes on the current browser and compare plans, sizes, facing, price and availability.
+- Browser speech/typed navigation, including guided visit, next/previous stage, save and compare. This is a command-based guide; microphone support depends on browser/device.
+- Existing lead fields and gate timing retained. Failed saves preserve inputs; only a confirmed server response unlocks the journey. Request IDs deduplicate retries.
+- Server endpoints for private Google Sheets enquiries and inventory refresh every 30 seconds.
+- Panorama retry UI, stale room-load cancellation, image fallback, keyboard modal focus and mobile layouts.
 
-## Run locally
+## Current connection status
 
-Requires Node 18 or newer.
+Google Sheets exist in Nimish's account. Their live connection is **pending activation**, blocked by the browser's stored permission for Google's automation setup page. The website explicitly displays sample availability while unconfigured; enquiry submissions return an honest unavailable response rather than a false success. See [setup and verification](integrations/google-sheets/SETUP.md).
 
-```bash
-npm install
-```
+## Development
 
-```bash
-npm run dev
-```
+Use Node 24 LTS and npm ci. Run npm run dev:api in one terminal and npm run dev -- --port 4173 in another. For browser checks, Chrome must be installed.
 
-Open the URL Vite prints (http://localhost:5173). To test on a phone on the same Wi-Fi, use the "Network" URL.
+- npm test: server validation, inventory integrity, voice parser and simulated Sheets bridge tests.
+- npm run test:browser: desktop/mobile journey, lead retry/resume, shortlist persistence, refreshed inventory, all active rooms, missing-image recovery and tower fallback.
+- npm run build: production output in dist. Vercel deploys the api directory as server functions.
 
-Production build and local preview:
+Browser lead/inventory tests mock remote responses. The Sheets script test uses a simulated Google service; neither is evidence of a live Google integration. Complete the real checks in SETUP.md after activation.
 
-```bash
-npm run build
-```
+## Deployment and preservation
 
-```bash
-npm run preview
-```
+Use only the private repository sudarshanknows/tourlo-residences-v2 and Vercel project tourlo-residences-v2 in team tourlo. The original-readonly remote has a disabled push URL. The original-preserved branch points to the original reviewed commit.
 
-## Deploy on Vercel
+Server configuration: GOOGLE_SCRIPT_URL and GOOGLE_SCRIPT_SECRET. Never prefix those keys with VITE_ or ship secrets to the browser. Optional VITE_GA_ID enables existing analytics. The original Vercel project and original GitHub repository remain unchanged.
 
-1. Push this repo to GitHub and import it in Vercel (Framework preset: Vite, or "Other").
-2. Build command `npm run build`, output directory `dist` (already set in `vercel.json`).
-3. Add the environment variables below under Project Settings, Environment Variables, then redeploy.
+## Visual accuracy
 
-`vercel.json` allows the site to be framed by any origin and enables motion sensors in frames. To limit framing to your own site, change `frame-ancestors *` to `frame-ancestors https://tourlo.in https://*.tourlo.in`.
+The new images improve lighting, materials and presentation. They are representative AI visualizations, not surveyed views, validated building geometry or a shared 3D model. Apartment plans are indicative and cannot be reconciled exactly to separately generated room images. Native stills are 1672 × 941 and panoramas 1774 × 887; they are not native 4K. A geometry-accurate final sales experience requires the approved architectural model, measured plans and location-specific views. No claim of perfect cross-view accuracy or uninterrupted service under all conditions is made.
 
-### Embedding in tourlo.in
-
-```html
-<iframe
-  src="https://YOUR-DEPLOYMENT.vercel.app/"
-  style="width:100%;height:100vh;border:0"
-  allow="gyroscope; accelerometer; microphone; fullscreen"
-  loading="lazy"
-  title="Tourlo interactive demo"></iframe>
-```
-
-The `allow` attribute is needed for the gyroscope and the voice guide's microphone to work inside the iframe.
-
-### Vercel toolbar
-
-Vercel adds its feedback toolbar to preview links only (not to the production domain). To hide it on previews too: Project Settings, General, Vercel Toolbar, set Preview to off (check the team setting as well), or add the environment variable `VERCEL_PREVIEW_FEEDBACK_ENABLED` = `0` for Preview and redeploy.
-
-## Voice guide
-
-The mic button (on the tower and inside the 360 viewer) opens the voice guide. It uses the browser's built in speech recognition (Chrome, Edge, Safari; set to Indian English), so there is no server or API key. It understands places (rooftop, lobby, garden or pool, aerial or location, metro, plaza), homes (3 BHK, sky villa, study, lounge), floors ("floor 12", "twelfth floor", "top floor"), units ("unit 1402"), "show available 3 BHK", "availability", "night view" or "day view", "book a demo" and "go back". Firefox and some in-app browsers have no speech recognition; there the same panel takes typed commands. To teach it new phrases, edit `parseCommand` in `src/voice.js`.
-
-## Environment variables
-
-Copy `.env.example` to `.env.local` for local development. All are optional.
-
-| Variable | Purpose |
-| --- | --- |
-| `VITE_LEAD_WEBHOOK` | URL that receives the lead form as a JSON `POST`. If empty, the lead is logged to the browser console and the demo still unlocks. |
-| `VITE_GA_ID` | GA4 measurement id (`G-XXXXXXXXXX`). If empty, analytics is off. |
-| `VITE_BOOKING_URL` | Target of every "Book a full live demo" button. Defaults to https://tourlo.in. |
-
-These are baked in at build time, so redeploy after changing them.
-
-**Lead payload** includes `name`, `company`, `phone`, `email`, `role`, `trigger` (`time` or `second_room`), `page`, `referrer`, `submittedAt`, `activeSeconds`, `lastFloor`, `lastUnit` and `roomsViewed`. If the webhook does not answer CORS preflight requests (common with Zapier, Make and Google Apps Script), the demo retries as a simple `text/plain` request with the same JSON body.
-
-**GA4 events:** `floor_click`, `unit_open`, `pano_open`, `filter_used`, `lead_submit`, `book_demo_click`, `time_spent` (engaged seconds, sent when the tab is hidden or closed). With `?dev=1` all events are also logged to the console.
-
-## Editing inventory
-
-`data/inventory.json` is fetched at runtime, so you can edit it and redeploy without touching code.
-
-Each unit:
-
-```json
-{
-  "unit": "1203",
-  "floor": 12,
-  "type": "A",
-  "typeName": "Type A Residence",
-  "bhk": 3,
-  "duplex": false,
-  "carpetArea": 1240,
-  "facing": "E",
-  "status": "available",
-  "price": 32145000
-}
-```
-
-- `status` is `available`, `held` or `sold`.
-- `facing` is `N`, `E`, `S` or `W`. On Type A floors it also sets which quadrant of the key plan the unit sits in (N top left, E top right, S bottom right, W bottom left). Type B uses `E` (right) and `W` (left).
-- `price` is the agreement value in INR. The app formats it as Cr or Lakh.
-- The top level `pricing` block drives the cost sheet: floor rise per sq ft per floor, PLC by facing, GST rate, stamp duty rate and registration. Base price is shown as `price` minus floor rise minus PLC.
-
-To regenerate fresh dummy data (overwrites the file):
-
-```bash
-npm run inventory
-```
-
-## Photo landing (tower explorer)
-
-The landing uses the stills in `assets/landing/` (`hero_dusk.jpg` and `hero_day.jpg`, identical framing) and `data/tower-views.json`.
-
-For each view, `faces` lists the visible facades. Each face gives its left and right edge (`x0`, `x1`) and `levels`: the slab lines between floors as measured on the photo, from the top of the lobby (`levels[0]`) up to the roof slab. Each level is `[y at x0, y at x1]` in image pixels, so a building with 19 floors has 20 levels. Measuring the real lines (rather than dividing the facade evenly) keeps the boxes on the floors even where the top floor is taller.
-
-To replace or re-measure an image:
-
-1. Put the new JPGs in `assets/landing/` as `hero_dusk.jpg` and `hero_day.jpg` (same framing).
-2. Open the site with `?dev=1` and click points on a slab line near each edge of a face. The pixel position is logged and copied.
-3. Update `levels` in `data/tower-views.json` and refresh. The floor count in `tower-views.json` must match the floors in `data/inventory.json`.
-
-Each face also has a compass `side` (`S` for the left face and `E` for the right face in the current photo). It decides which part of the facade lights up for a home: Type A homes own the face they look onto, and the Type B E and W villas also wrap half of the S face. Homes on hidden sides show a note instead.
-
-All images must keep the size in `tower-views.json` (`width` and `height`). Open with `?view=3d` to see the Three.js massing model instead.
-
-## Editing 360 rooms and hotspots
-
-`data/hotspots.json` defines the tours: `site` (exterior walk), `typeA`, `typeB` and `amenity` (the original garden panos, kept for reference). Each room has an `id`, a `label`, a `file` name, an optional starting `initialYaw` and `initialPitch`, and a list of `hotspots`:
-
-```json
-{ "to": "typeA_study", "label": "Study", "yaw": 40, "pitch": -4 }
-```
-
-Add `"tour": "typeA"` to a hotspot to jump into another tour, as the lobby does into the apartments. A hotspot without `to` is shown as an information label, as in the aerial view.
-
-`yaw` is degrees left or right of the centre of the pano image (positive is right, range -180 to 180). `pitch` is degrees up or down (positive is up).
-
-The current positions are sensible placeholders. To place them precisely:
-
-1. Open the site with `?dev=1`, for example http://localhost:5173/?dev=1
-2. Open a 360 room. A readout shows the yaw and pitch under the pointer.
-3. Click the spot where the hotspot should sit (a doorway, for example). The yaw and pitch are logged to the console and a ready JSON snippet is copied to the clipboard.
-4. Paste it into `data/hotspots.json`, set `to` and `label`, save and refresh.
-
-## Swapping in real project panos
-
-Keep the same file names and the app picks them up with no code changes.
-
-1. Put 2:1 equirectangular JPGs (4096x2048 recommended) in `assets/panos/` using the existing names:
-   - `typeA_living.jpg`, `typeA_living_dining.jpg`, `typeA_study.jpg`
-   - `typeB_living.jpg`, `typeB_lounge.jpg`, `typeB_stair_dining.jpg`
-   - `amenity_garden_1.jpg`, `amenity_garden_2.jpg`
-   - `ext_plaza.jpg`, `ext_lobby.jpg`, `ext_podium.jpg`, `ext_rooftop.jpg`, `ext_aerial.jpg`, `ext_station.jpg`
-2. Rebuild the phone versions (2048x1024) and room thumbnails:
-
-   ```bash
-   npm run panos -- --force
-   ```
-
-   This writes `assets/panos-mobile/` and `assets/thumbs/`. You can also supply your own phone panos in `assets/panos-mobile/` with the same names.
-3. Re-check hotspot positions with `?dev=1` and adjust `data/hotspots.json`.
-
-Screens narrower than 768 px (or devices that cannot handle 4096 px textures) get the phone panos; larger screens get the desktop panos.
-
-To add or rename rooms, add the JPG and a matching room entry in `data/hotspots.json`.
-
-### Balcony view
-
-`assets/views/balcony_view.jpg` is in place, so Type A units show the button. If `assets/views/balcony_view.jpg` exists, Type A units show a "View from balcony" button that opens the image full screen. If the file is missing, the button stays hidden.
-
-## Project structure
-
-```
-index.html            App shell
-src/main.js           App wiring: panels, filters, unit view, tours
-src/photo-tower.js    Photo tower explorer with the SVG floor overlay
-src/tower.js          Three.js massing model (fallback, ?view=3d)
-src/viewer.js         360 viewer, hotspots, gyroscope, dev mode
-src/plans.js          Indicative SVG plans and floor key plan
-src/cost.js           Indicative cost sheet
-src/lead.js           Lead gate and webhook
-src/voice.js          Voice guide: speech recognition and command parsing
-src/analytics.js      GA4 loader and events
-src/styles.css        All styles
-data/inventory.json   Units and pricing (runtime)
-data/hotspots.json    Tours, rooms and hotspots (runtime)
-data/tower-views.json Photo angles and facade corners (runtime)
-assets/               Panos, phone panos, thumbnails, optional views
-scripts/              Inventory generator and pano preparation
-```
-
-`assets/` and `data/` are served as they are in development and copied into `dist/` on build.
+The two legacy amenity panoramas remain as the existing 3D fallback garden content. All twelve scenes in the main guided/site/apartment experience use the new assets.
