@@ -15,9 +15,9 @@ A separate project-focused residential experience, preserving the original Tourl
 
 ## Current connection status
 
-Google Sheets exist in Nimish's account. Their live connection is **pending activation**, blocked by the browser's stored permission for Google's automation setup page. The website explicitly displays sample availability while unconfigured; enquiry submissions return an honest unavailable response rather than a false success. See [setup and verification](integrations/google-sheets/SETUP.md).
+The private Google Sheets are owned by Nimish and shared with the automation account sudarshanknowsmarketing@gmail.com. The Google web app is deployed and the production connection is configured. Live checks confirmed all 70 homes, a real enquiry save, retry deduplication, and status/price changes followed by restoration. See [setup and verification](integrations/google-sheets/SETUP.md).
 
-The V2 review build offers **Continue preview without submitting** on the lead form, including after a failed submission. It resumes the pending visit and remembers preview access for this tab without recording a successful enquiry or sending contact details. Set `VITE_PREVIEW_MODE=false` and rebuild when the live connection is verified and the launch should require lead capture.
+The lead gate requires a confirmed save. The temporary preview bypass has been removed, and previous preview sessions no longer unlock the walkthrough.
 
 ## Development
 

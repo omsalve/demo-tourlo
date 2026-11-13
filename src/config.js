@@ -1,7 +1,6 @@
 const env = import.meta.env;
 
 export const config = {
-  previewEnabled: env.VITE_PREVIEW_MODE !== 'false',
   leadWebhook: '/api/leads',
   gaId: (env.VITE_GA_ID || '').trim(),
   bookingUrl: (env.VITE_BOOKING_URL || '').trim() || 'https://tourlo.in',
