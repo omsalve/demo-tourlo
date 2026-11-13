@@ -3,6 +3,7 @@ import { session } from './storage.js';
 import { track } from './analytics.js';
 
 const KEY = 'tourlo_demo_unlocked';
+const PREVIEW_KEY = 'tourlo_preview_access';
 const ACTIVE_LIMIT = 60; // seconds of interaction before the form appears
 const ROLES = ['Developer', 'Sales', 'CP', 'Other'];
 
@@ -13,7 +14,7 @@ export class LeadGate {
     this.modal = document.getElementById('lead-modal');
     this.content = document.getElementById('lead-content');
     this.getContext = getContext || (() => ({}));
-    this.unlocked = session.get(KEY) === '1';
+    this.unlocked = session.get(KEY) === '1' || (config.previewEnabled && session.get(PREVIEW_KEY) === '1');
     this.required = false; // becomes true once a trigger fires
     this.activeSeconds = 0;
     this.lastInteraction = -Infinity;
@@ -85,6 +86,7 @@ export class LeadGate {
         <p class="lead-error" role="alert" hidden></p>
         <div class="form-actions">
           <button class="btn btn-gold btn-block" type="submit">Continue exploring</button>
+          ${config.previewEnabled ? '<button class="btn btn-ghost btn-block" type="button" data-preview>Continue preview without submitting</button><p class="privacy">Explore the full preview without sending your details.</p>' : ''}
           <button class="btn btn-ghost btn-block" type="button" data-later>Not now</button>
         </div>
         <p class="privacy">No spam. Your details stay with the Tourlo team.</p>
@@ -105,6 +107,17 @@ export class LeadGate {
     form.querySelector('[data-later]').addEventListener('click', () => {
       this.pending = null;
       this.hide();
+    });
+    form.querySelector('[data-preview]')?.addEventListener('click', () => {
+      this.unlocked = true;
+      this.required = false;
+      session.set(PREVIEW_KEY, '1');
+      track('preview_continue', { trigger: this.reason || 'unknown' });
+      const action = this.pending;
+      this.pending = null;
+      this.hide();
+      this.content.replaceChildren();
+      action?.();
     });
     form.addEventListener('input', (e) => e.target.closest('.field')?.classList.remove('has-error'));
     form.addEventListener('submit', (e) => {
@@ -136,6 +149,8 @@ export class LeadGate {
 
   async submit(data, btn) {
     btn.disabled = true;
+    const previewButton = this.content.querySelector('[data-preview]');
+    if (previewButton) previewButton.disabled = true;
     btn.textContent = 'Unlocking';
     const payload = {
       name: data.name.trim(),
@@ -156,6 +171,7 @@ export class LeadGate {
     try { await sendLead(payload); } catch (error) {
       const message=this.content.querySelector('.lead-error');
       message.hidden=false; message.textContent=error.message || 'Your details could not be saved. Please try again.';
+      if (previewButton) previewButton.disabled = false;
       btn.disabled=false; btn.textContent='Try again'; return;
     }
     this.submissionId=null;

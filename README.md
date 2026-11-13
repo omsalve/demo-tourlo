@@ -17,6 +17,8 @@ A separate project-focused residential experience, preserving the original Tourl
 
 Google Sheets exist in Nimish's account. Their live connection is **pending activation**, blocked by the browser's stored permission for Google's automation setup page. The website explicitly displays sample availability while unconfigured; enquiry submissions return an honest unavailable response rather than a false success. See [setup and verification](integrations/google-sheets/SETUP.md).
 
+The V2 review build offers **Continue preview without submitting** on the lead form, including after a failed submission. It resumes the pending visit and remembers preview access for this tab without recording a successful enquiry or sending contact details. Set `VITE_PREVIEW_MODE=false` and rebuild when the live connection is verified and the launch should require lead capture.
+
 ## Development
 
 Use Node 24 LTS and npm ci. Run npm run dev:api in one terminal and npm run dev -- --port 4173 in another. For browser checks, Chrome must be installed.
