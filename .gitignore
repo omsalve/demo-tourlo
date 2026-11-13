@@ -1,9 +1,13 @@
 node_modules
+.next
+out
+next-env.d.ts
 review/
 test-results/
 playwright-report/
 scripts/implement-v2.mjs
-dist
 .env
 .env.local
+.env*.local
 .vercel
+*.tsbuildinfo

@@ -2,12 +2,11 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
-import leads,{validateLead} from '../api/leads.js';
-import inventory,{mergeInventory} from '../api/inventory.js';
-import {parseCommand} from '../src/voice.js';
-const base=JSON.parse(await fs.readFile('data/inventory.json','utf8'));
+import {handleLead,validateLead} from '../lib/server/leads.js';
+import {handleInventory,mergeInventory} from '../lib/server/inventory.js';
+import {parseCommand} from '../lib/demo/voice.js';
+const base=JSON.parse(await fs.readFile('public/data/inventory.json','utf8'));
 const visitor={requestId:'fedcba98-7654-4321-aaaa-123456789abc',name:'Test Visitor',company:'Test Company',email:'test@example.com',phone:'9999999999',role:'Other'};
-function response(){return {headers:{},setHeader(k,v){this.headers[k]=v;},status(code){this.code=code;return this;},json(body){this.body=body;return this;}};}
 
 test('lead validation rejects invalid contact data and limits context',()=>{
  for(const patch of [{requestId:'invalid'},{email:'not-an-email'},{phone:'123'},{role:'Admin'},{name:'x'}])assert.throws(()=>validateLead({...visitor,...patch}));
@@ -16,8 +15,10 @@ test('lead validation rejects invalid contact data and limits context',()=>{
 });
 test('lead endpoint rejects foreign origins and never reports success without configuration',async()=>{
  const oldUrl=process.env.GOOGLE_SCRIPT_URL,oldSecret=process.env.GOOGLE_SCRIPT_SECRET;delete process.env.GOOGLE_SCRIPT_URL;delete process.env.GOOGLE_SCRIPT_SECRET;
- try{let res=response();await leads({method:'POST',headers:{origin:'https://other.example',host:'tourlo.example'},body:visitor},res);assert.equal(res.code,403);
- res=response();await leads({method:'POST',headers:{origin:'https://tourlo.example',host:'tourlo.example'},body:visitor},res);assert.equal(res.code,503);assert.equal(res.body.ok,false);
+ try{let res=await handleLead({origin:'https://other.example',host:'tourlo.example',body:JSON.stringify(visitor)});assert.equal(res.status,403);
+ res=await handleLead({origin:'https://tourlo.example',host:'tourlo.example',body:JSON.stringify(visitor)});assert.equal(res.status,503);assert.equal(res.body.ok,false);
+ res=await handleLead({origin:null,host:'tourlo.example',body:'{not json'});assert.equal(res.status,400);
+ res=await handleLead({origin:null,host:'tourlo.example',body:'x'.repeat(20000)});assert.equal(res.status,413);
  }finally{if(oldUrl)process.env.GOOGLE_SCRIPT_URL=oldUrl;if(oldSecret)process.env.GOOGLE_SCRIPT_SECRET=oldSecret;}
 });
 test('inventory updates status and price while preserving unit specifications',()=>{
@@ -25,7 +26,7 @@ test('inventory updates status and price while preserving unit specifications',(
  assert.equal(merged.units[0].status,'sold');assert.equal(merged.units[0].price,base.units[0].price+100);assert.equal(merged.units[0].bhk,base.units[0].bhk);assert.equal(merged.source,'google-sheets');
  for(const bad of [rows.slice(1),[...rows,rows[0]],rows.map((r,i)=>i? r:{...r,status:'unknown'}),rows.map((r,i)=>i?r:{...r,price:-1})])assert.throws(()=>mergeInventory(base,bad));
 });
-test('unconfigured inventory is explicitly identified as sample',async()=>{const old=process.env.GOOGLE_SCRIPT_URL;delete process.env.GOOGLE_SCRIPT_URL;try{const res=response();await inventory({method:'GET'},res);assert.equal(res.body.source,'sample');assert.equal(res.body.units.length,70);}finally{if(old)process.env.GOOGLE_SCRIPT_URL=old;}});
+test('unconfigured inventory is explicitly identified as sample',async()=>{const old=process.env.GOOGLE_SCRIPT_URL;delete process.env.GOOGLE_SCRIPT_URL;try{const res=await handleInventory(base);assert.equal(res.status,200);assert.equal(res.body.source,'sample');assert.equal(res.body.units.length,70);}finally{if(old)process.env.GOOGLE_SCRIPT_URL=old;}});
 test('voice commands include guide, shortlist, spoken floor numbers and unknown fallback',()=>{for(const [q,type] of [['start guided visit','guided'],['next step','next'],['save this home','save'],['compare homes','compare'],['floor twelve','floor'],['unrecognised command xyz','unknown']])assert.equal(parseCommand(q).type,type);assert.equal(parseCommand('floor twelve').floor,12);});
 test('Sheets bridge rejects unauthenticated writes, deduplicates retries and escapes formulas',async()=>{
  const headers=['requestId','name','company','phone','email','role','status'];const rows=[headers];let flushes=0,locks=0;

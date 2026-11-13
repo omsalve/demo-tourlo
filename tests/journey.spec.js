@@ -29,7 +29,7 @@ test('guided visit resumes after confirmed lead save and compares saved homes',a
 });
 
 test('live refresh changes a selected home without replacing the shortlist',async({page})=>{
- const inventory=JSON.parse(await fs.readFile('data/inventory.json','utf8'));let updated=false;
+ const inventory=JSON.parse(await fs.readFile('public/data/inventory.json','utf8'));let updated=false;
  await page.route('**/api/inventory',route=>route.fulfill({json:{...inventory,source:'google-sheets',units:inventory.units.map(u=>u.unit==='101'&&updated?{...u,status:'sold',price:31000000}:u)}}));
  await page.goto(base+'/?unit=101');await expect(page.locator('#panel-title')).toHaveText('Unit 101');
  await page.locator('[data-action="save"]').click();updated=true;await page.evaluate(()=>window.dispatchEvent(new Event('online')));

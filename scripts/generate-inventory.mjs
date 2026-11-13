@@ -1,6 +1,6 @@
-// Regenerates data/inventory.json with seeded dummy data.
+// Regenerates public/data/inventory.json with seeded dummy data.
 // Usage: npm run inventory
-// After generating you can hand edit data/inventory.json freely; the app reads it at runtime.
+// After generating you can hand edit public/data/inventory.json freely; the app reads it at runtime.
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -88,6 +88,6 @@ const out = {
   units,
 };
 
-await writeFile(path.join(root, 'data/inventory.json'), JSON.stringify(out, null, 2) + '\n');
+await writeFile(path.join(root, 'public/data/inventory.json'), JSON.stringify(out, null, 2) + '\n');
 const count = (s) => units.filter((u) => u.status === s).length;
 console.log(`Wrote ${n} units: ${count('available')} available, ${count('held')} held, ${count('sold')} sold.`);

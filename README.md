@@ -19,23 +19,45 @@ The private Google Sheets are owned by Nimish and shared with the automation acc
 
 The lead gate requires a confirmed save. The temporary preview bypass has been removed, and previous preview sessions no longer unlock the walkthrough.
 
+## Stack
+
+Next.js 16 (App Router) with React 19, deployed on Vercel. Converted from the original Vite build with the experience itself unchanged:
+
+- `app/page.js` renders the static page markup. `app/demo-boot.js` loads the framework-free sales gallery in `lib/demo/` (Three.js tower, 360 viewer, lead gate, voice guide, shortlist) in the browser after hydration.
+- `app/api/leads` and `app/api/inventory` are Route Handlers (Vercel functions). Their logic lives in `lib/server/` so it is unit tested without a server.
+- Images and panoramas live in `public/assets/`, runtime JSON in `public/data/`. File names are unchanged, so real project panoramas can be swapped in using the same names.
+- `next.config.mjs` sets the iframe, sensor/microphone and cache headers that used to live in `vercel.json`.
+
 ## Development
 
-Use Node 24 LTS and npm ci. Run npm run dev:api in one terminal and npm run dev -- --port 4173 in another. For browser checks, Chrome must be installed.
+Use Node 24 LTS and `npm ci`.
 
-- npm test: server validation, inventory integrity, voice parser and simulated Sheets bridge tests.
-- npm run test:browser: desktop/mobile journey, lead retry/resume, shortlist persistence, refreshed inventory, all active rooms, missing-image recovery and tower fallback.
-- npm run build: production output in dist. Vercel deploys the api directory as server functions.
+- `npm run dev`: development server with the API routes at http://127.0.0.1:4173 (no separate API process any more).
+- `npm run build` then `npm start`: production build and server on the same port.
+- `npm test`: lead validation, lead/inventory handlers, inventory merging, voice parser and simulated Sheets bridge tests.
+- `npm run test:browser`: desktop/mobile journey, lead retry/resume, shortlist persistence, refreshed inventory, all active rooms, missing-image recovery and tower fallback. Run `npm run build` first; Playwright starts `npm start` itself. Uses installed Chrome by default; set `PW_CHANNEL=msedge` to use Edge, or `TEST_BASE_URL` to test a deployed URL.
+- `npm run inventory` regenerates `public/data/inventory.json`; `npm run panos` regenerates mobile panoramas and thumbnails from `public/assets/panos/`.
 
 Browser lead/inventory tests mock remote responses. The Sheets script test uses a simulated Google service; neither is evidence of a live Google integration. Complete the real checks in SETUP.md after activation.
 
+## Environment variables
+
+| Name | Where | Purpose |
+| --- | --- | --- |
+| `GOOGLE_SCRIPT_URL` | Server only | Apps Script `/exec` URL. Without it, inventory is served as labelled sample data and enquiries return 503. |
+| `GOOGLE_SCRIPT_SECRET` | Server only | Shared secret checked by the Apps Script. |
+| `NEXT_PUBLIC_GA_ID` | Public, build time | Optional GA4 measurement ID. |
+| `NEXT_PUBLIC_BOOKING_URL` | Public, build time | Optional booking link (fallback https://tourlo.in). |
+
+Never prefix the Google keys with `NEXT_PUBLIC_` or `VITE_`. The legacy `VITE_GA_ID` and `VITE_BOOKING_URL` names are still read, so existing Vercel settings keep working. Public values are inlined at build time: redeploy after changing them. Copy `.env.example` to `.env.local` for local use.
+
 ## Deployment and preservation
+
+`vercel.json` sets the framework to Next.js, which overrides the project's previous Vite build/output settings; no other Vercel changes are needed. If the project's dashboard has an Output Directory override of `dist`, clear it. Node 24 is pinned in `package.json`.
 
 Use only the private repository sudarshanknows/tourlo-residences-v2 and Vercel project tourlo-residences-v2 in team tourlo. The original-readonly remote has a disabled push URL. The original-preserved branch points to the original reviewed commit.
 
-V2 preview: https://tourlo-residences-v2-tourlo.vercel.app/ (team deployment protection applies). The initial release was uploaded directly from the committed source because Vercel's GitHub installation cannot currently see the new private repository. Automatic deployment on GitHub push is not connected. The new Vercel project ID is prj_njngtzavCv1NXa81MMeQpo7wDVGv.
-
-Server configuration: GOOGLE_SCRIPT_URL and GOOGLE_SCRIPT_SECRET. Never prefix those keys with VITE_ or ship secrets to the browser. Optional VITE_GA_ID enables existing analytics. The original Vercel project and original GitHub repository remain unchanged.
+V2 preview: https://tourlo-residences-v2-tourlo.vercel.app/ (team deployment protection applies). The initial release was uploaded directly from the committed source because Vercel's GitHub installation cannot currently see the new private repository. Automatic deployment on GitHub push is not connected. The new Vercel project ID is prj_njngtzavCv1NXa81MMeQpo7wDVGv. The original Vercel project and original GitHub repository remain unchanged.
 
 ## Visual accuracy
 
