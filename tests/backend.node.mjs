@@ -13,14 +13,33 @@ test('lead validation rejects invalid contact data and limits context',()=>{
  const valid=validateLead({...visitor,source:'forged',secret:'never-copy',activeSeconds:-1,savedHomes:['101','102','103','104']});
  assert.equal(valid.source,'tourlo-v2');assert.equal(valid.secret,undefined);assert.equal(valid.activeSeconds,0);assert.equal(valid.savedHomes.length,3);
 });
-test('lead endpoint rejects foreign origins and never reports success without configuration',async()=>{
- const oldUrl=process.env.GOOGLE_SCRIPT_URL,oldSecret=process.env.GOOGLE_SCRIPT_SECRET;delete process.env.GOOGLE_SCRIPT_URL;delete process.env.GOOGLE_SCRIPT_SECRET;
- try{let res=await handleLead({origin:'https://other.example',host:'tourlo.example',body:JSON.stringify(visitor)});assert.equal(res.status,403);
- res=await handleLead({origin:'https://tourlo.example',host:'tourlo.example',body:JSON.stringify(visitor)});assert.equal(res.status,503);assert.equal(res.body.ok,false);
+function withEnv(vars,fn){return async()=>{const saved={};for(const k of Object.keys(vars)){saved[k]=process.env[k];if(vars[k]==null)delete process.env[k];else process.env[k]=vars[k];}
+ try{await fn();}finally{for(const [k,v] of Object.entries(saved)){if(v==null)delete process.env[k];else process.env[k]=v;}}};}
+function mockFetch(responder){const calls=[];const real=globalThis.fetch;globalThis.fetch=async(url,init)=>{calls.push({url,init,body:JSON.parse(init.body)});return responder(calls.length);};return {calls,restore:()=>{globalThis.fetch=real;}};}
+const resendEnv={RESEND_API_KEY:'re_test_key',LEAD_EMAIL_TO:'sales@example.com, team@example.com',LEAD_EMAIL_FROM:'Tourlo <leads@example.com>'};
+const post=(extra={})=>handleLead({origin:'https://tourlo.example',host:'tourlo.example',body:JSON.stringify({...visitor,...extra})});
+
+test('lead endpoint rejects foreign origins and never reports success without configuration',withEnv({RESEND_API_KEY:null,LEAD_EMAIL_TO:null},async()=>{
+ let res=await handleLead({origin:'https://other.example',host:'tourlo.example',body:JSON.stringify(visitor)});assert.equal(res.status,403);
+ res=await post();assert.equal(res.status,503);assert.equal(res.body.ok,false);
  res=await handleLead({origin:null,host:'tourlo.example',body:'{not json'});assert.equal(res.status,400);
  res=await handleLead({origin:null,host:'tourlo.example',body:'x'.repeat(20000)});assert.equal(res.status,413);
- }finally{if(oldUrl)process.env.GOOGLE_SCRIPT_URL=oldUrl;if(oldSecret)process.env.GOOGLE_SCRIPT_SECRET=oldSecret;}
-});
+}));
+test('lead is emailed through Resend with reply-to, idempotency key and escaped content',withEnv(resendEnv,async()=>{
+ const m=mockFetch(()=>Response.json({id:'email_1'}));
+ try{const res=await post({name:'<b>Test</b> Visitor',savedHomes:['101'],activeSeconds:125});assert.equal(res.status,200);assert.equal(res.body.ok,true);assert.equal(res.body.duplicate,false);
+  const [c]=m.calls;assert.equal(c.url,'https://api.resend.com/emails');assert.equal(c.init.headers.Authorization,'Bearer re_test_key');assert.equal(c.init.headers['Idempotency-Key'],'tourlo-lead/'+visitor.requestId);
+  assert.deepEqual(c.body.to,['sales@example.com','team@example.com']);assert.equal(c.body.from,'Tourlo <leads@example.com>');assert.equal(c.body.reply_to,'test@example.com');
+  assert.ok(c.body.html.includes('&lt;b&gt;Test&lt;/b&gt;'));assert.ok(!c.body.html.includes('<b>Test'));assert.ok(c.body.text.includes('Saved homes: 101'));assert.ok(c.body.text.includes('Time exploring: 2m 5s'));assert.ok(!c.body.subject.includes('\n')&&!c.body.subject.includes('\r'));
+ }finally{m.restore();}
+}));
+test('a retry Resend already accepted is confirmed once; provider failures never unlock',withEnv(resendEnv,async()=>{
+ let m=mockFetch(()=>Response.json({name:'invalid_idempotent_request',message:'used'},{status:409}));
+ try{const res=await post();assert.equal(res.status,200);assert.equal(res.body.duplicate,true);}finally{m.restore();}
+ for(const failure of [()=>Response.json({name:'concurrent_idempotent_requests'},{status:409}),()=>Response.json({name:'rate_limit_exceeded'},{status:429}),()=>Response.json({name:'invalid_api_Key'},{status:403}),()=>{throw new TypeError('fetch failed');}]){
+  m=mockFetch(failure);try{const res=await post();assert.equal(res.status,502);assert.equal(res.body.ok,false);assert.ok(!JSON.stringify(res.body).includes('re_test_key'));}finally{m.restore();}
+ }
+}));
 test('inventory updates status and price while preserving unit specifications',()=>{
  const rows=base.units.map(u=>({...u,bhk:99,status:'sold',price:u.price+100}));const merged=mergeInventory(base,rows);
  assert.equal(merged.units[0].status,'sold');assert.equal(merged.units[0].price,base.units[0].price+100);assert.equal(merged.units[0].bhk,base.units[0].bhk);assert.equal(merged.source,'google-sheets');

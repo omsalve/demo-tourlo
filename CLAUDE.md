@@ -7,9 +7,9 @@ Demo project name: **Tourlo Demo Residences** (fictional, Mumbai).
 
 ## Stack
 - Next.js (App Router) on Vercel. `app/page.js` is the static markup shell; `app/demo-boot.js` imports the framework-free sales gallery in `lib/demo/` in the browser after hydration. Three.js for the tower and the 360 viewer. (Originally Vite; converted to Next.js.)
-- Server code is limited to two Route Handlers, `app/api/leads` and `app/api/inventory`, with their logic in `lib/server/` (Google Sheets bridge). Everything else is static.
+- Server code is limited to two Route Handlers, `app/api/leads` and `app/api/inventory`, with their logic in `lib/server/` (Resend for enquiries, Google Sheets bridge for live inventory). Everything else is static.
 - Must work inside an iframe (headers in `next.config.mjs`).
-- Env vars: server-only `GOOGLE_SCRIPT_URL`, `GOOGLE_SCRIPT_SECRET`; public `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_BOOKING_URL` (legacy `VITE_*` names are still accepted). The `VITE_LEAD_WEBHOOK` mentioned below was replaced by `/api/leads`.
+- Env vars: server-only `RESEND_API_KEY`, `LEAD_EMAIL_TO`, `LEAD_EMAIL_FROM` (enquiries) and `GOOGLE_SCRIPT_URL`, `GOOGLE_SCRIPT_SECRET` (inventory); public `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_BOOKING_URL` (legacy `VITE_*` names are still accepted). The `VITE_LEAD_WEBHOOK` mentioned below was replaced by `/api/leads`, which emails each enquiry through Resend.
 
 ## Assets already in this repo
 `public/assets/panos/` (4096x2048 equirectangular JPG, desktop) and `public/assets/panos-mobile/` (2048x1024, phones):

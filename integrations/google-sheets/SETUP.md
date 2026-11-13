@@ -1,5 +1,7 @@
 # Live Google Sheets connection
 
+> Enquiries are now emailed through Resend (see the README). This bridge is used for live inventory; its `lead` action and the Enquiries sheet remain available but are no longer called by the website.
+
 Sheet owner: Nimish (nimish.dop@gmail.com). Automation account: sudarshanknowsmarketing@gmail.com, granted editor access to both sheets with the user’s authorization. Both spreadsheets remain private.
 
 - Inventory: https://docs.google.com/spreadsheets/d/1ynXheNVynrehVnixiWyekhvU-8ylW5wMVSdMPnve_RM/edit

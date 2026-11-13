@@ -9,11 +9,13 @@ A separate project-focused residential experience, preserving the original Tourl
 - Recalibrated clickable tower floors, 70 homes across 19 levels, filters and indicative cost sheets.
 - Save up to three homes on the current browser and compare plans, sizes, facing, price and availability.
 - Browser speech/typed navigation, including guided visit, next/previous stage, save and compare. This is a command-based guide; microphone support depends on browser/device.
-- Existing lead fields and gate timing retained. Failed saves preserve inputs; only a confirmed server response unlocks the journey. Request IDs deduplicate retries.
-- Server endpoints for private Google Sheets enquiries and inventory refresh every 30 seconds.
+- Existing lead fields and gate timing retained. Enquiries are emailed to the team through Resend, with the visitor as reply-to. Failed sends preserve inputs; only a confirmed send unlocks the journey. Request IDs are sent as Resend idempotency keys, so a retry never sends a second email.
+- Server endpoint for live inventory from a private Google Sheet, refreshed every 30 seconds.
 - Panorama retry UI, stale room-load cancellation, image fallback, keyboard modal focus and mobile layouts.
 
 ## Current connection status
+
+Enquiries now go through Resend (`RESEND_API_KEY`, `LEAD_EMAIL_TO`, optional `LEAD_EMAIL_FROM`). The Google Sheets notes below now apply to live inventory only; the Apps Script still supports its `lead` action if enquiries ever need to go to the sheet again.
 
 The private Google Sheets are owned by Nimish and shared with the automation account sudarshanknowsmarketing@gmail.com. The Google web app is deployed and the production connection is configured. Live checks confirmed all 70 homes, a real enquiry save, retry deduplication, and status/price changes followed by restoration. See [setup and verification](integrations/google-sheets/SETUP.md).
 
@@ -34,22 +36,25 @@ Use Node 24 LTS and `npm ci`.
 
 - `npm run dev`: development server with the API routes at http://127.0.0.1:4173 (no separate API process any more).
 - `npm run build` then `npm start`: production build and server on the same port.
-- `npm test`: lead validation, lead/inventory handlers, inventory merging, voice parser and simulated Sheets bridge tests.
+- `npm test`: lead validation, the lead handler against a mocked Resend API (payload, escaping, idempotency, failures), inventory handler and merging, voice parser and simulated Sheets bridge tests.
 - `npm run test:browser`: desktop/mobile journey, lead retry/resume, shortlist persistence, refreshed inventory, all active rooms, missing-image recovery and tower fallback. Run `npm run build` first; Playwright starts `npm start` itself. Uses installed Chrome by default; set `PW_CHANNEL=msedge` to use Edge, or `TEST_BASE_URL` to test a deployed URL.
 - `npm run inventory` regenerates `public/data/inventory.json`; `npm run panos` regenerates mobile panoramas and thumbnails from `public/assets/panos/`.
 
-Browser lead/inventory tests mock remote responses. The Sheets script test uses a simulated Google service; neither is evidence of a live Google integration. Complete the real checks in SETUP.md after activation.
+Browser lead/inventory tests mock remote responses, and the Resend and Sheets tests use simulated services; none of them is evidence of a live integration. After adding the Resend variables, submit one labelled test enquiry on the deployed site and confirm it arrives. Complete the real checks in SETUP.md after activation.
 
 ## Environment variables
 
 | Name | Where | Purpose |
 | --- | --- | --- |
-| `GOOGLE_SCRIPT_URL` | Server only | Apps Script `/exec` URL. Without it, inventory is served as labelled sample data and enquiries return 503. |
+| `RESEND_API_KEY` | Server only | Resend API key (sending access is enough). Required for the enquiry form; without it enquiries return 503 and the walkthrough stays locked. |
+| `LEAD_EMAIL_TO` | Server only | Recipient address(es) for enquiries, comma separated. Required. |
+| `LEAD_EMAIL_FROM` | Server only | Sender on a domain verified in Resend, e.g. `Tourlo Enquiries <enquiries@tourlo.in>`. Defaults to `onboarding@resend.dev`, which only delivers to the Resend account's own email. |
+| `GOOGLE_SCRIPT_URL` | Server only | Optional Apps Script `/exec` URL for live inventory. Without it, inventory is served as labelled sample data. |
 | `GOOGLE_SCRIPT_SECRET` | Server only | Shared secret checked by the Apps Script. |
 | `NEXT_PUBLIC_GA_ID` | Public, build time | Optional GA4 measurement ID. |
 | `NEXT_PUBLIC_BOOKING_URL` | Public, build time | Optional booking link (fallback https://tourlo.in). |
 
-Never prefix the Google keys with `NEXT_PUBLIC_` or `VITE_`. The legacy `VITE_GA_ID` and `VITE_BOOKING_URL` names are still read, so existing Vercel settings keep working. Public values are inlined at build time: redeploy after changing them. Copy `.env.example` to `.env.local` for local use.
+Never prefix the server keys with `NEXT_PUBLIC_` or `VITE_`. The legacy `VITE_GA_ID` and `VITE_BOOKING_URL` names are still read, so existing Vercel settings keep working. Vercel applies environment variable changes to new deployments only, so redeploy after adding or changing any of them. Copy `.env.example` to `.env.local` for local use.
 
 ## Deployment and preservation
 
